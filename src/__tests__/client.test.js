@@ -4,7 +4,7 @@ import {assert} from 'chai';
 import ProfileClient from '../client.js';
 
 describe('Test methods in client.js', () => {
-  const methods = ProfileClient({endpoint: 'some_url'});
+  const methods = ProfileClient({endpoint: 'some_url'}); // eslint-disable-line
   
   /*
   it('Should ensure createProfile is present', () => {

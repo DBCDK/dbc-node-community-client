@@ -1,6 +1,6 @@
 'use strict';
 
-import request from 'request';
+import request from 'request'; // eslint-disable-line
 
 /**
  * Verifies a Profile in Loopback using verification token sent by email.
