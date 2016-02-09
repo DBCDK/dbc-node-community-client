@@ -1,0 +1,37 @@
+{
+  "name": "dbc-node-community-client",
+  "version": "1.0.0",
+  "description": "Client for the DBC community service",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --compilers js:babel/register src/__tests__ -R mocha-jenkins-reporter",
+    "test:junit": "npm run test",
+    "test:watch": "mocha --compilers js:babel/register src/__tests__ -w",
+    "build": "npm run cleardest && babel ./src -d dist --ignore __tests__",
+    "cleardest": "rm -rf ./dist",
+    "lint": "eslint ./src",
+    "lint:checkstyle": "eslint ./src  -o report.xml -f checkstyle",
+    "watch": "npm run cleardest && babel ./src --watch -d dist --ignore __tests__"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DBCDK/dbc-node-community-client.git"
+  },
+  "author": "dbcdk",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "request": "^2.60.0"
+  },
+  "devDependencies": {
+    "babel": "^5.8.20",
+    "babel-core": "^5.8.20",
+    "babel-eslint": "^4.0.5",
+    "chai": "^3.2.0",
+    "eslint": "^1.0.0",
+    "mocha": "^2.2.5",
+    "mocha-jenkins-reporter": "^0.1.9"
+  },
+  "engines": {
+    "node": ">4.2.2"
+  }
+}
