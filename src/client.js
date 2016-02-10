@@ -46,6 +46,17 @@ function checkIfUserProfileExists(endpoint, params) {
   return promisePostRequest(req);
 }
 
+function createProfile(endpoint, {username}) {
+  return promisePostRequest({
+    url: endpoint + 'api/Profiles',
+    json: {
+      username,
+      created: Date.now(),
+      lastUpdated: Date.now()
+    }
+  });
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -62,6 +73,7 @@ export default function CommunityClient(config = null) {
 
   return {
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
-    loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint)
+    loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
+    createProfile: createProfile.bind(null, config.endpoint)
   };
 }
