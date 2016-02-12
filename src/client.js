@@ -2,22 +2,9 @@
 
 import request from 'request';
 
-function promiseGetRequest(req) { // eslint-disable-line
+function promiseRequest(method, req) {
   return new Promise((resolve, reject) => {
-    request.get(req, (err, httpResponse) => {
-      if (err) {
-        reject(err, httpResponse);
-      }
-      else {
-        resolve(httpResponse);
-      }
-    });
-  });
-}
-
-function promisePostRequest(req) {
-  return new Promise((resolve, reject) => {
-    request.post(req, (err, httpResponse) => {
+    request[method](req, (err, httpResponse) => {
       if (err) {
         reject(err, httpResponse);
       }
@@ -29,21 +16,38 @@ function promisePostRequest(req) {
 }
 
 function loginAndGetProfile(endpoint, {username, timestamp, authtoken, ttl}) {
-  return promisePostRequest({
+  return promiseRequest('post', {
     url: `${endpoint}api/Profiles/unilogin`,
     form: {username, timestamp, authtoken, ttl}
   });
 }
 
 function checkIfUserProfileExists(endpoint, params) {
-  const req = {
+  return promiseRequest('post', {
     url: `${endpoint}api/Profiles/checkIfUserExists`,
     form: {
       username: params.username
     }
-  };
+  });
+}
 
-  return promisePostRequest(req);
+function createProfile(endpoint, {username}) {
+  return promiseRequest('post', {
+    url: endpoint + 'api/Profiles',
+    json: {
+      username,
+      created: Date.now(),
+      lastUpdated: Date.now()
+    }
+  });
+}
+
+function updateProfile(endpoint, {uid, profile, accessToken}) {
+  return promiseRequest('put', {
+    url: endpoint + 'api/Profiles/' + uid + '?access_token=' + accessToken,
+    body: profile,
+    json: true
+  });
 }
 
 /**
@@ -62,6 +66,8 @@ export default function CommunityClient(config = null) {
 
   return {
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
-    loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint)
+    loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
+    createProfile: createProfile.bind(null, config.endpoint),
+    updateProfile: updateProfile.bind(null, config.endpoint)
   };
 }
