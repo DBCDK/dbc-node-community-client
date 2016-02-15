@@ -50,6 +50,22 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
   });
 }
 
+
+function joinGroup(endpoint, {uid, groupId, accessToken}) {
+  return promiseRequest('put', {
+    url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
+    json: true
+  });
+}
+
+
+function leaveGroup(endpoint, {uid, groupId, accessToken}) {
+  return promiseRequest('delete', {
+    url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
+    json: true
+  });
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -68,6 +84,8 @@ export default function CommunityClient(config = null) {
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
     loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
     createProfile: createProfile.bind(null, config.endpoint),
-    updateProfile: updateProfile.bind(null, config.endpoint)
+    updateProfile: updateProfile.bind(null, config.endpoint),
+    joinGroup: joinGroup.bind(null, config.endpoint),
+    leaveGroup: leaveGroup.bind(null, config.endpoint)
   };
 }
