@@ -97,6 +97,89 @@ function getProfileImage(endpoint, {id}) {
   });
 }
 
+
+function joinGroup(endpoint, {uid, groupId, accessToken}) {
+  return promiseRequest('put', {
+    url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
+    json: true
+  });
+}
+
+
+function leaveGroup(endpoint, {uid, groupId, accessToken}) {
+  return promiseRequest('delete', {
+    url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
+    json: true
+  });
+}
+
+/**
+ * Fetches a Group in Loopback
+ */
+function getGroup(endpoint, params) {
+  return new Promise((resolve) => {
+    const id = params.id; // {include: ['owner', {comments: ['owner']}]}
+    const filter_str = JSON.stringify({include: [{posts: ['owner', {comments: ['owner']}]}, 'members']});
+    const url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
+/**
+ * Searches through Groups in Loopback
+ */
+function queryGroups(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const accessToken = params.accessToken;
+    var pattern = new RegExp('.*' + params.query + '.*', 'i');
+    const filter_str = JSON.stringify({where: {name: {regexp: pattern.toString()}}, include: ['members']});
+    const url = endpoint + 'api/Groups?access_token=' + accessToken + '&filter=' + filter_str;
+    request.get({url}, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
+ * Create a Post
+ */
+function createGroupPost(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const accessToken = params.accessToken;
+    const groupId = params.groupId;
+    const url = endpoint + 'api/Groups/' + groupId + '/posts?access_token=' + accessToken;
+    const postBody = {
+      title: params.title,
+      content: params.content,
+      timeCreated: (new Date()).toUTCString(),
+      postownerid: params.postownerid
+    };
+
+    request.post({
+      url,
+      json: true,
+      body: postBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(res);
+    });
+  });
+}
+
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -119,5 +202,10 @@ export default function CommunityClient(config = null) {
     updateProfileImage: updateProfileImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
     getProfileImage: getProfileImage.bind(null, config.endpoint)
+    joinGroup: joinGroup.bind(null, config.endpoint),
+    leaveGroup: leaveGroup.bind(null, config.endpoint),
+    getGroup: getGroup.bind(null, config.endpoint),
+    queryGroups: queryGroups.bind(null, config.endpoint),
+    createGroupPost: createGroupPost.bind(null, config.endpoint)
   };
 }
