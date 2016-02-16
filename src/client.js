@@ -68,13 +68,15 @@ function updateProfileImage(endpoint, {uid, profileImage, accessToken}) {
       }
     }
   }).then((res) => {
-    let remoteFileObject = JSON.parse(res.body);
-    remoteFileObject.imageFile = remoteFileObject.id;
-    delete remoteFileObject.id;
-    return promiseRequest('post', {
-      url: endpoint + 'api/Profiles/' + uid + '/image?access_token=' + accessToken,
-      json: true,
-      body: remoteFileObject
+    return promiseRequest('del', {url: endpoint + 'api/Profiles/' + uid + '/image?access_token=' + accessToken}).then(() => {
+      let remoteFileObject = JSON.parse(res.body);
+      remoteFileObject.imageFile = remoteFileObject.id;
+      delete remoteFileObject.id;
+      return promiseRequest('post', {
+        url: endpoint + 'api/Profiles/' + uid + '/image?access_token=' + accessToken,
+        json: true,
+        body: remoteFileObject
+      });
     });
   });
 }
