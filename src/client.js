@@ -53,7 +53,7 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
 
 function updateProfileImage(endpoint, {uid, profileImage, accessToken}) {
   let fileExtension = profileImage.originalname.split('.');
-  fileExtension = fileExtension[fileExtension.length -1];
+  fileExtension = fileExtension[fileExtension.length - 1];
   const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
 
   return promiseRequest('post', {
