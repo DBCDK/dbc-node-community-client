@@ -179,7 +179,6 @@ function createGroupPost(endpoint, params) {
   });
 }
 
-
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -201,7 +200,7 @@ export default function CommunityClient(config = null) {
     updateProfile: updateProfile.bind(null, config.endpoint),
     updateProfileImage: updateProfileImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
-    getProfileImage: getProfileImage.bind(null, config.endpoint)
+    getProfileImage: getProfileImage.bind(null, config.endpoint),
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
