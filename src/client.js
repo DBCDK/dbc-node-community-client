@@ -131,6 +131,12 @@ function createGroup(endpoint, params) {
     fileExtension = fileExtension[fileExtension.length - 1];
     const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
 
+    joinGroup(endpoint, {
+      uid,
+      groupId: createResult.body.id,
+      accessToken
+    });
+
     return promiseRequest('post', {
       url: endpoint + 'api/files/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
       formData: {
