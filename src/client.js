@@ -99,7 +99,6 @@ function getImage(endpoint, {id}) {
   });
 }
 
-
 function joinGroup(endpoint, {uid, groupId, accessToken}) {
   return promiseRequest('put', {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
@@ -115,13 +114,57 @@ function leaveGroup(endpoint, {uid, groupId, accessToken}) {
   });
 }
 
+function createGroup(endpoint, params) {
+  const {name, description, colour, coverImage, uid, accessToken} = params;
+  return promiseRequest('post', {
+    url: endpoint + 'api/Groups?access_token' + accessToken,
+    json: true,
+    body: {
+      name,
+      description,
+      colour,
+      timeCreated: (new Date()).toUTCString(),
+      groupownerid: uid
+    }
+  }).then((createResult) => {
+    let fileExtension = coverImage.originalname.split('.');
+    fileExtension = fileExtension[fileExtension.length - 1];
+    const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
+
+    return promiseRequest('post', {
+      url: endpoint + 'api/files/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
+      formData: {
+        file: {
+          value: coverImage.buffer,
+          options: {
+            contentType: coverImage.mimetype,
+            filename: fileName
+          }
+        }
+      }
+    }).then((fileResult) => {
+      fileResult = JSON.parse(fileResult.body);
+      return promiseRequest('put', {
+        url: endpoint + 'api/files/' + fileResult.id + '?access_token=' + accessToken,
+        json: true,
+        body: {
+          groupCoverImageId: createResult.body.id
+        }
+      }).then((updatedFileResult) => {
+        createResult.body.file = updatedFileResult.body;
+        return Promise.resolve(createResult);
+      });
+    });
+  });
+}
+
 /**
  * Fetches a Group in Loopback
  */
 function getGroup(endpoint, params) {
   return new Promise((resolve) => {
-    const id = params.id; // {include: ['owner', {comments: ['owner']}]}
-    const filter_str = JSON.stringify({include: [{posts: ['owner', 'image', {comments: ['owner']}]}, 'members']});
+    const id = params.id;
+    const filter_str = JSON.stringify({include: ['coverImage', {posts: ['owner', 'image', {comments: ['owner']}]}, 'members']});
     const url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
     request.get(
       {
@@ -207,6 +250,7 @@ export default function CommunityClient(config = null) {
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
-    createGroupPost: createGroupPost.bind(null, config.endpoint)
+    createGroupPost: createGroupPost.bind(null, config.endpoint),
+    createGroup: createGroup.bind(null, config.endpoint)
   };
 }
