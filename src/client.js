@@ -51,8 +51,8 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
   });
 }
 
-function updateProfileImage(endpoint, {uid, profileImage, accessToken}) {
-  let fileExtension = profileImage.originalname.split('.');
+function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
+  let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
   const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
 
@@ -60,20 +60,20 @@ function updateProfileImage(endpoint, {uid, profileImage, accessToken}) {
     url: endpoint + 'api/files/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
     formData: {
       file: {
-        value: profileImage.buffer,
+        value: image.buffer,
         options: {
-          contentType: profileImage.mimetype,
+          contentType: image.mimetype,
           filename: fileName
         }
       }
     }
   }).then((res) => {
-    return promiseRequest('del', {url: endpoint + 'api/Profiles/' + uid + '/image?access_token=' + accessToken}).then(() => {
+    return promiseRequest('del', {url: endpoint + 'api/' + relationType + '/' + relationId + '/image?access_token=' + accessToken}).then(() => {
       let remoteFileObject = JSON.parse(res.body);
       remoteFileObject.imageFile = remoteFileObject.id;
       delete remoteFileObject.id;
       return promiseRequest('post', {
-        url: endpoint + 'api/Profiles/' + uid + '/image?access_token=' + accessToken,
+        url: endpoint + 'api/' + relationType + '/' + relationId + '/image?access_token=' + accessToken,
         json: true,
         body: remoteFileObject
       });
@@ -93,7 +93,7 @@ function getFullProfile(endpoint, {uid, accessToken}) {
   });
 }
 
-function getProfileImage(endpoint, {id}) {
+function getImage(endpoint, {id}) {
   return promiseRequest('get', {
     url: endpoint + 'api/files/' + id
   });
@@ -121,7 +121,7 @@ function leaveGroup(endpoint, {uid, groupId, accessToken}) {
 function getGroup(endpoint, params) {
   return new Promise((resolve) => {
     const id = params.id; // {include: ['owner', {comments: ['owner']}]}
-    const filter_str = JSON.stringify({include: [{posts: ['owner', {comments: ['owner']}]}, 'members']});
+    const filter_str = JSON.stringify({include: [{posts: ['owner', 'image', {comments: ['owner']}]}, 'members']});
     const url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
     request.get(
       {
@@ -200,9 +200,9 @@ export default function CommunityClient(config = null) {
     loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
-    updateProfileImage: updateProfileImage.bind(null, config.endpoint),
+    updateImage: updateImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
-    getProfileImage: getProfileImage.bind(null, config.endpoint),
+    getImage: getImage.bind(null, config.endpoint),
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
