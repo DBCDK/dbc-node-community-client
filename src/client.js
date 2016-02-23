@@ -99,6 +99,12 @@ function getImage(endpoint, {id}) {
   });
 }
 
+function getResizedImage(endpoint, {id, size}) {
+  return promiseRequest('get', {
+    url: endpoint + 'api/imageCollections/' + id + '/download/' + size
+  });
+}
+
 function joinGroup(endpoint, {uid, groupId, accessToken}) {
   return promiseRequest('put', {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
@@ -252,6 +258,7 @@ export default function CommunityClient(config = null) {
     updateImage: updateImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
     getImage: getImage.bind(null, config.endpoint),
+    getResizedImage: getResizedImage.bind(null, config.endpoint),
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
