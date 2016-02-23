@@ -52,7 +52,6 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
 }
 
 function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
-  console.error(image);
   let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
   const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
@@ -72,7 +71,6 @@ function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
     let remoteFileObject = JSON.parse(res.body);
     let bodyObj = {};
     bodyObj[relationType] = relationId;
-    console.error(remoteFileObject, bodyObj);
     return promiseRequest(
       'put',
       {
