@@ -52,12 +52,13 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
 }
 
 function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
+  console.error(image);
   let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
   const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
 
   return promiseRequest('post', {
-    url: endpoint + 'api/files/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
+    url: endpoint + 'api/ImageCollections/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
     formData: {
       file: {
         value: image.buffer,
@@ -68,16 +69,18 @@ function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
       }
     }
   }).then((res) => {
-    return promiseRequest('del', {url: endpoint + 'api/' + relationType + '/' + relationId + '/image?access_token=' + accessToken}).then(() => {
-      let remoteFileObject = JSON.parse(res.body);
-      remoteFileObject.imageFile = remoteFileObject.id;
-      delete remoteFileObject.id;
-      return promiseRequest('post', {
-        url: endpoint + 'api/' + relationType + '/' + relationId + '/image?access_token=' + accessToken,
+    let remoteFileObject = JSON.parse(res.body);
+    let bodyObj = {};
+    bodyObj[relationType] = relationId;
+    console.error(remoteFileObject, bodyObj);
+    return promiseRequest(
+      'put',
+      {
+        url: endpoint + 'api/ImageCollections/' + remoteFileObject.id + '?access_token=' + accessToken,
         json: true,
-        body: remoteFileObject
-      });
-    });
+        body: bodyObj
+      }
+    );
   });
 }
 
@@ -144,7 +147,7 @@ function createGroup(endpoint, params) {
     });
 
     return promiseRequest('post', {
-      url: endpoint + 'api/files/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
+      url: endpoint + 'api/ImageCollections/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
       formData: {
         file: {
           value: coverImage.buffer,
@@ -157,7 +160,7 @@ function createGroup(endpoint, params) {
     }).then((fileResult) => {
       fileResult = JSON.parse(fileResult.body);
       return promiseRequest('put', {
-        url: endpoint + 'api/files/' + fileResult.id + '?access_token=' + accessToken,
+        url: endpoint + 'api/ImageCollections/' + fileResult.id + '?access_token=' + accessToken,
         json: true,
         body: {
           groupCoverImageId: createResult.body.id
