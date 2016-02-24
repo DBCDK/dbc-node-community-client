@@ -32,6 +32,15 @@ function checkIfUserProfileExists(endpoint, params) {
   });
 }
 
+function checkIfDisplayNameIsTaken(endpoint, {displayname}) {
+  return promiseRequest('post', {
+    url: `${endpoint}api/Profiles/checkIfDisplayNameIsTaken`,
+    form: {
+      displayname
+    }
+  });
+}
+
 function createProfile(endpoint, {username}) {
   return promiseRequest('post', {
     url: endpoint + 'api/Profiles',
@@ -253,6 +262,7 @@ export default function CommunityClient(config = null) {
 
   return {
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
+    checkIfDisplayNameIsTaken: checkIfDisplayNameIsTaken.bind(null, config.endpoint),
     loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
