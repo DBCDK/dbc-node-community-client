@@ -1,58 +1,82 @@
 'use strict';
 
-import request from 'request';
-import uuid from 'node-uuid';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = CommunityClient;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _request = require('request');
+
+var _request2 = _interopRequireDefault(_request);
+
+var _nodeUuid = require('node-uuid');
+
+var _nodeUuid2 = _interopRequireDefault(_nodeUuid);
 
 function promiseRequest(method, req) {
-  return new Promise((resolve, reject) => {
-    request[method](req, (err, httpResponse) => {
+  return new Promise(function (resolve, reject) {
+    _request2['default'][method](req, function (err, httpResponse) {
       if (err) {
         reject(err, httpResponse);
-      }
-      else {
+      } else {
         resolve(httpResponse);
       }
     });
   });
 }
 
-function loginAndGetProfile(endpoint, {username, timestamp, authtoken, ttl}) {
+function loginAndGetProfile(endpoint, _ref) {
+  var username = _ref.username;
+  var timestamp = _ref.timestamp;
+  var authtoken = _ref.authtoken;
+  var ttl = _ref.ttl;
+
   return promiseRequest('post', {
-    url: `${endpoint}api/Profiles/unilogin`,
-    form: {username, timestamp, authtoken, ttl}
+    url: endpoint + 'api/Profiles/unilogin',
+    form: { username: username, timestamp: timestamp, authtoken: authtoken, ttl: ttl }
   });
 }
 
 function checkIfUserProfileExists(endpoint, params) {
   return promiseRequest('post', {
-    url: `${endpoint}api/Profiles/checkIfUserExists`,
+    url: endpoint + 'api/Profiles/checkIfUserExists',
     form: {
       username: params.username
     }
   });
 }
 
-function checkIfDisplayNameIsTaken(endpoint, {displayname}) {
+function checkIfDisplayNameIsTaken(endpoint, _ref2) {
+  var displayname = _ref2.displayname;
+
   return promiseRequest('post', {
-    url: `${endpoint}api/Profiles/checkIfDisplayNameIsTaken`,
+    url: endpoint + 'api/Profiles/checkIfDisplayNameIsTaken',
     form: {
-      displayname
+      displayname: displayname
     }
   });
 }
 
-function createProfile(endpoint, {username}) {
+function createProfile(endpoint, _ref3) {
+  var username = _ref3.username;
+
   return promiseRequest('post', {
     url: endpoint + 'api/Profiles',
     json: {
-      username,
+      username: username,
       created: Date.now(),
       lastUpdated: Date.now()
     }
   });
 }
 
-function updateProfile(endpoint, {uid, profile, accessToken}) {
+function updateProfile(endpoint, _ref4) {
+  var uid = _ref4.uid;
+  var profile = _ref4.profile;
+  var accessToken = _ref4.accessToken;
+
   return promiseRequest('put', {
     url: endpoint + 'api/Profiles/' + uid + '?access_token=' + accessToken,
     body: profile,
@@ -60,10 +84,15 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
   });
 }
 
-function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
-  let fileExtension = image.originalname.split('.');
+function updateImage(endpoint, _ref5) {
+  var image = _ref5.image;
+  var relationId = _ref5.relationId;
+  var relationType = _ref5.relationType;
+  var accessToken = _ref5.accessToken;
+
+  var fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
-  const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
+  var fileName = _nodeUuid2['default'].v4().replace('-', '') + '.' + fileExtension;
 
   return promiseRequest('post', {
     url: endpoint + 'api/ImageCollections/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
@@ -76,18 +105,15 @@ function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
         }
       }
     }
-  }).then((res) => {
-    let remoteFileObject = JSON.parse(res.body);
-    let bodyObj = {};
+  }).then(function (res) {
+    var remoteFileObject = JSON.parse(res.body);
+    var bodyObj = {};
     bodyObj[relationType] = relationId;
-    return promiseRequest(
-      'put',
-      {
-        url: endpoint + 'api/ImageCollections/' + remoteFileObject.id + '?access_token=' + accessToken,
-        json: true,
-        body: bodyObj
-      }
-    );
+    return promiseRequest('put', {
+      url: endpoint + 'api/ImageCollections/' + remoteFileObject.id + '?access_token=' + accessToken,
+      json: true,
+      body: bodyObj
+    });
   });
 }
 
@@ -97,33 +123,48 @@ function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
  * @param uid
  * @param accessToken
  */
-function getFullProfile(endpoint, {uid, accessToken}) {
+function getFullProfile(endpoint, _ref6) {
+  var uid = _ref6.uid;
+  var accessToken = _ref6.accessToken;
+
   return promiseRequest('get', {
     url: endpoint + 'api/Profiles/' + uid + '?filter=%7B%22include%22%3A%5B%22image%22%5D%7D&access_token=' + accessToken
   });
 }
 
-function getImage(endpoint, {id}) {
+function getImage(endpoint, _ref7) {
+  var id = _ref7.id;
+
   return promiseRequest('get', {
     url: endpoint + 'api/files/' + id
   });
 }
 
-function getResizedImage(endpoint, {id, size}) {
+function getResizedImage(endpoint, _ref8) {
+  var id = _ref8.id;
+  var size = _ref8.size;
+
   return promiseRequest('get', {
     url: endpoint + 'api/imageCollections/' + id + '/download/' + size
   });
 }
 
-function joinGroup(endpoint, {uid, groupId, accessToken}) {
+function joinGroup(endpoint, _ref9) {
+  var uid = _ref9.uid;
+  var groupId = _ref9.groupId;
+  var accessToken = _ref9.accessToken;
+
   return promiseRequest('put', {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
     json: true
   });
 }
 
+function leaveGroup(endpoint, _ref10) {
+  var uid = _ref10.uid;
+  var groupId = _ref10.groupId;
+  var accessToken = _ref10.accessToken;
 
-function leaveGroup(endpoint, {uid, groupId, accessToken}) {
   return promiseRequest('del', {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
     json: true
@@ -131,26 +172,32 @@ function leaveGroup(endpoint, {uid, groupId, accessToken}) {
 }
 
 function createGroup(endpoint, params) {
-  const {name, description, colour, coverImage, uid, accessToken} = params;
+  var name = params.name;
+  var description = params.description;
+  var colour = params.colour;
+  var coverImage = params.coverImage;
+  var uid = params.uid;
+  var accessToken = params.accessToken;
+
   return promiseRequest('post', {
     url: endpoint + 'api/Groups?access_token' + accessToken,
     json: true,
     body: {
-      name,
-      description,
-      colour,
-      timeCreated: (new Date()).toUTCString(),
+      name: name,
+      description: description,
+      colour: colour,
+      timeCreated: new Date().toUTCString(),
       groupownerid: uid
     }
-  }).then((createResult) => {
-    let fileExtension = coverImage.originalname.split('.');
+  }).then(function (createResult) {
+    var fileExtension = coverImage.originalname.split('.');
     fileExtension = fileExtension[fileExtension.length - 1];
-    const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
+    var fileName = _nodeUuid2['default'].v4().replace('-', '') + '.' + fileExtension;
 
     joinGroup(endpoint, {
-      uid,
+      uid: uid,
       groupId: createResult.body.id,
-      accessToken
+      accessToken: accessToken
     });
 
     return promiseRequest('post', {
@@ -164,7 +211,7 @@ function createGroup(endpoint, params) {
           }
         }
       }
-    }).then((fileResult) => {
+    }).then(function (fileResult) {
       fileResult = JSON.parse(fileResult.body);
       return promiseRequest('put', {
         url: endpoint + 'api/ImageCollections/' + fileResult.id + '?access_token=' + accessToken,
@@ -172,7 +219,7 @@ function createGroup(endpoint, params) {
         body: {
           groupCoverImageId: createResult.body.id
         }
-      }).then((updatedFileResult) => {
+      }).then(function (updatedFileResult) {
         createResult.body.file = updatedFileResult.body;
         return Promise.resolve(createResult);
       });
@@ -184,18 +231,15 @@ function createGroup(endpoint, params) {
  * Fetches a Group in Loopback
  */
 function getGroup(endpoint, params) {
-  return new Promise((resolve) => {
-    const id = params.id;
-    const filter_str = JSON.stringify({include: params.filter || []});
-    const url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
-    request.get(
-      {
-        url: url
-      },
-      (err, httpResponse) => {
-        resolve(httpResponse);
-      }
-    );
+  return new Promise(function (resolve) {
+    var id = params.id;
+    var filter_str = JSON.stringify({ include: params.filter || [] });
+    var url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
+    _request2['default'].get({
+      url: url
+    }, function (err, httpResponse) {
+      resolve(httpResponse);
+    });
   });
 }
 
@@ -203,12 +247,12 @@ function getGroup(endpoint, params) {
  * Searches through Groups in Loopback
  */
 function queryGroups(endpoint, params) {
-  return new Promise((resolve, reject) => {
-    const accessToken = params.accessToken;
+  return new Promise(function (resolve, reject) {
+    var accessToken = params.accessToken;
     var pattern = new RegExp('.*' + params.query + '.*', 'i');
-    const filter_str = JSON.stringify({where: {name: {regexp: pattern.toString()}}, include: ['members']});
-    const url = endpoint + 'api/Groups?access_token=' + accessToken + '&filter=' + filter_str;
-    request.get({url}, (err, res) => {
+    var filter_str = JSON.stringify({ where: { name: { regexp: pattern.toString() } }, include: ['members'] });
+    var url = endpoint + 'api/Groups?access_token=' + accessToken + '&filter=' + filter_str;
+    _request2['default'].get({ url: url }, function (err, res) {
       if (err) {
         reject(err);
       }
@@ -221,22 +265,22 @@ function queryGroups(endpoint, params) {
  * Create a Post on a Group
  */
 function createPost(endpoint, params) {
-  return new Promise((resolve, reject) => {
-    const accessToken = params.accessToken;
-    const groupId = params.parentId;
-    const url = endpoint + 'api/Groups/' + groupId + '/posts?access_token=' + accessToken;
-    const postBody = {
+  return new Promise(function (resolve, reject) {
+    var accessToken = params.accessToken;
+    var groupId = params.parentId;
+    var url = endpoint + 'api/Groups/' + groupId + '/posts?access_token=' + accessToken;
+    var postBody = {
       title: params.title,
       content: params.content,
-      timeCreated: (new Date()).toUTCString(),
+      timeCreated: new Date().toUTCString(),
       postownerid: params.ownerid
     };
 
-    request.post({
-      url,
+    _request2['default'].post({
+      url: url,
       json: true,
       body: postBody
-    }, (err, res) => {
+    }, function (err, res) {
       if (err) {
         reject(err);
       }
@@ -250,22 +294,22 @@ function createPost(endpoint, params) {
  * Create a Comment on a Post
  */
 function createComment(endpoint, params) {
-  return new Promise((resolve, reject) => {
-    const accessToken = params.accessToken;
-    const postId = params.parentId;
-    const url = endpoint + 'api/Posts/' + postId + '/comments?access_token=' + accessToken;
-    const postBody = {
+  return new Promise(function (resolve, reject) {
+    var accessToken = params.accessToken;
+    var postId = params.parentId;
+    var url = endpoint + 'api/Posts/' + postId + '/comments?access_token=' + accessToken;
+    var postBody = {
       title: params.title,
       content: params.content,
-      timeCreated: (new Date()).toUTCString(),
+      timeCreated: new Date().toUTCString(),
       commentownerid: params.ownerid
     };
 
-    request.post({
-      url,
+    _request2['default'].post({
+      url: url,
       json: true,
       body: postBody
-    }, (err, res) => {
+    }, function (err, res) {
       if (err) {
         reject(err);
       }
@@ -283,7 +327,9 @@ function createComment(endpoint, params) {
  * @param {Object} config Config object with the necessary parameters to use
  * the webservice
  */
-export default function CommunityClient(config = null) {
+
+function CommunityClient() {
+  var config = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
 
   if (!config || !config.endpoint) {
     throw new Error('Expected config object but got null or no endpoint provided');
@@ -308,3 +354,5 @@ export default function CommunityClient(config = null) {
     createGroup: createGroup.bind(null, config.endpoint)
   };
 }
+
+module.exports = exports['default'];
