@@ -218,18 +218,47 @@ function queryGroups(endpoint, params) {
 }
 
 /**
- * Create a Post
+ * Create a Post on a Group
  */
-function createGroupPost(endpoint, params) {
+function createPost(endpoint, params) {
   return new Promise((resolve, reject) => {
     const accessToken = params.accessToken;
-    const groupId = params.groupId;
+    const groupId = params.parentId;
     const url = endpoint + 'api/Groups/' + groupId + '/posts?access_token=' + accessToken;
     const postBody = {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
-      postownerid: params.postownerid
+      postownerid: params.ownerid
+    };
+
+    request.post({
+      url,
+      json: true,
+      body: postBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+
+      resolve(res);
+    });
+  });
+}
+
+/**
+ * Create a Comment on a Post
+ */
+function createComment(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const accessToken = params.accessToken;
+    const postId = params.parentId;
+    const url = endpoint + 'api/Posts/' + postId + '/comments?access_token=' + accessToken;
+    const postBody = {
+      title: params.title,
+      content: params.content,
+      timeCreated: (new Date()).toUTCString(),
+      commentownerid: params.ownerid
     };
 
     request.post({
@@ -274,7 +303,8 @@ export default function CommunityClient(config = null) {
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
-    createGroupPost: createGroupPost.bind(null, config.endpoint),
+    createPost: createPost.bind(null, config.endpoint),
+    createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint)
   };
 }
