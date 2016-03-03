@@ -303,7 +303,8 @@ function createPost(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: new Date().toUTCString(),
-      postownerid: params.ownerid
+      postownerid: params.ownerid,
+      postcontainergroupid: groupId
     };
 
     _request2['default'].post({
@@ -332,7 +333,8 @@ function createComment(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: new Date().toUTCString(),
-      commentownerid: params.ownerid
+      commentownerid: params.ownerid,
+      commentcontainerpostid: postId
     };
 
     _request2['default'].post({
