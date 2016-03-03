@@ -186,8 +186,44 @@ function createGroup(endpoint, params) {
 function getGroup(endpoint, params) {
   return new Promise((resolve) => {
     const id = params.id;
-    const filter_str = JSON.stringify({include: params.filter || []});
+    const filter_str = JSON.stringify(params.filter || {});
     const url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
+/**
+ * Fetches a posts for a group in Loopback
+ */
+function getPosts(endpoint, params) {
+  return new Promise((resolve) => {
+    const filter_str = JSON.stringify(params.filter || {});
+    const url = endpoint + 'api/Posts/?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+/**
+ * Fetches a comments for a post in Loopback
+ */
+function getComments(endpoint, params) {
+  return new Promise((resolve) => {
+    const id = params.id;
+    const filter_str = JSON.stringify(params.filter || {});
+    const url = `${endpoint}api/Posts/${id}/comments/?filter=${filter_str}`;
     request.get(
       {
         url: url
@@ -302,6 +338,8 @@ export default function CommunityClient(config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    getPosts: getPosts.bind(null, config.endpoint),
+    getComments: getComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
