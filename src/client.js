@@ -265,7 +265,8 @@ function createPost(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
-      postownerid: params.ownerid
+      postownerid: params.ownerid,
+      postcontainergroupid: groupId
     };
 
     request.post({
@@ -294,7 +295,8 @@ function createComment(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
-      commentownerid: params.ownerid
+      commentownerid: params.ownerid,
+      commentcontainerpostid: postId
     };
 
     request.post({
