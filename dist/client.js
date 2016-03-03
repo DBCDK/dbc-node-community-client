@@ -274,6 +274,15 @@ function getComments(endpoint, params) {
 }
 
 /**
+ * Get all comments (not necessarily related to a specific post).
+ */
+function getAllComments(endpoint, params) {
+  return promiseRequest('get', {
+    url: endpoint + 'api/Comments/?filter=' + JSON.stringify(params.filter || {})
+  });
+}
+
+/**
  * Searches through Groups in Loopback
  */
 function queryGroups(endpoint, params) {
@@ -382,6 +391,7 @@ function CommunityClient() {
     getGroup: getGroup.bind(null, config.endpoint),
     getPosts: getPosts.bind(null, config.endpoint),
     getComments: getComments.bind(null, config.endpoint),
+    getAllComments: getAllComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
