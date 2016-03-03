@@ -217,7 +217,7 @@ function createGroup(endpoint, params) {
         url: endpoint + 'api/ImageCollections/' + fileResult.id + '?access_token=' + accessToken,
         json: true,
         body: {
-          groupCoverImageId: createResult.body.id
+          groupCoverImageCollectionId: createResult.body.id
         }
       }).then(function (updatedFileResult) {
         createResult.body.file = updatedFileResult.body;
