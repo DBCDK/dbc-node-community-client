@@ -380,6 +380,7 @@ export default function CommunityClient(config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    listGroups: listGroups.bind(null, config.endpoint),
     getPosts: getPosts.bind(null, config.endpoint),
     getComments: getComments.bind(null, config.endpoint),
     getAllComments: getAllComments.bind(null, config.endpoint),
