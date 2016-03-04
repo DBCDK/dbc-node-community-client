@@ -364,14 +364,14 @@ function countComments(endpoint, _ref11) {
   var accessToken = _ref11.accessToken;
   var where = _ref11.where;
 
-  return promiseRequest('get', endpoint + '/Comments/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
+  return promiseRequest('get', endpoint + 'api/Comments/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
 function countPosts(endpoint, _ref12) {
   var accessToken = _ref12.accessToken;
   var where = _ref12.where;
 
-  return promiseRequest('get', endpoint + '/Posts/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
+  return promiseRequest('get', endpoint + 'api/Posts/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
 /**

@@ -323,11 +323,11 @@ function createComment(endpoint, params) {
 }
 
 function countComments(endpoint, {accessToken, where}) {
-  return promiseRequest('get', `${endpoint}/Comments/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
+  return promiseRequest('get', `${endpoint}api/Comments/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
 
 function countPosts(endpoint, {accessToken, where}) {
-  return promiseRequest('get', `${endpoint}/Posts/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
+  return promiseRequest('get', `${endpoint}api/Posts/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
 
 /**
