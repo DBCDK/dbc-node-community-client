@@ -269,16 +269,20 @@ function createPost(endpoint, params) {
   return new Promise((resolve, reject) => {
     const accessToken = params.accessToken;
     const groupId = params.parentId;
-    const url = endpoint + 'api/Groups/' + groupId + '/posts?access_token=' + accessToken;
+    const url = endpoint + 'api/Posts?access_token=' + accessToken;
     const postBody = {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
       postownerid: params.ownerid,
-      postcontainergroupid: groupId
+      postcontainergroupid: groupId,
+      groupid: groupId,
+      id: params.id || null
     };
 
-    request.post({
+    console.log(postBody);
+
+    request.put({
       url,
       json: true,
       body: postBody
@@ -299,16 +303,18 @@ function createComment(endpoint, params) {
   return new Promise((resolve, reject) => {
     const accessToken = params.accessToken;
     const postId = params.parentId;
-    const url = endpoint + 'api/Posts/' + postId + '/comments?access_token=' + accessToken;
+    const url = endpoint + 'api/Comments?access_token=' + accessToken;
     const postBody = {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
       commentownerid: params.ownerid,
-      commentcontainerpostid: postId
+      commentcontainerpostid: postId,
+      postid: postId,
+      id: params.id || null
     };
 
-    request.post({
+    request.put({
       url,
       json: true,
       body: postBody
