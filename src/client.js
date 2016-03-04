@@ -200,6 +200,29 @@ function getGroup(endpoint, params) {
 }
 
 /**
+ * Lists groups given a filter (no search)
+ * No access restrictions .
+ *
+ * @param endpoint
+ * @param params
+ * @returns {Promise}
+ */
+function listGroups(endpoint, params) {
+  return new Promise((resolve) =>{
+    const filter_str = JSON.stringify(params.filter || []);
+    const url = endpoint + 'api/Groups/?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
+/**
  * Searches through Groups in Loopback
  */
 function queryGroups(endpoint, params) {
@@ -302,6 +325,7 @@ export default function CommunityClient(config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    listGroups: listGroups.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
