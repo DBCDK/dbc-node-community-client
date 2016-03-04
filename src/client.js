@@ -170,7 +170,7 @@ function createGroup(endpoint, params) {
         url: endpoint + 'api/ImageCollections/' + fileResult.id + '?access_token=' + accessToken,
         json: true,
         body: {
-          groupCoverImageId: createResult.body.id
+          groupCoverImageCollectionId: createResult.body.id
         }
       }).then((updatedFileResult) => {
         createResult.body.file = updatedFileResult.body;
@@ -186,7 +186,7 @@ function createGroup(endpoint, params) {
 function getGroup(endpoint, params) {
   return new Promise((resolve) => {
     const id = params.id;
-    const filter_str = JSON.stringify({include: params.filter || []});
+    const filter_str = JSON.stringify(params.filter || {});
     const url = endpoint + 'api/Groups/' + id + '?filter=' + filter_str;
     request.get(
       {
@@ -200,17 +200,12 @@ function getGroup(endpoint, params) {
 }
 
 /**
- * Lists groups given a filter (no search)
- * No access restrictions .
- *
- * @param endpoint
- * @param params
- * @returns {Promise}
+ * Fetches a posts for a group in Loopback
  */
-function listGroups(endpoint, params) {
-  return new Promise((resolve) =>{
-    const filter_str = JSON.stringify(params.filter || []);
-    const url = endpoint + 'api/Groups/?filter=' + filter_str;
+function getPosts(endpoint, params) {
+  return new Promise((resolve) => {
+    const filter_str = JSON.stringify(params.filter || {});
+    const url = endpoint + 'api/Posts/?filter=' + filter_str;
     request.get(
       {
         url: url
@@ -219,6 +214,33 @@ function listGroups(endpoint, params) {
         resolve(httpResponse);
       }
     );
+  });
+}
+/**
+ * Fetches a comments for a post in Loopback
+ */
+function getComments(endpoint, params) {
+  return new Promise((resolve) => {
+    const id = params.id;
+    const filter_str = JSON.stringify(params.filter || {});
+    const url = `${endpoint}api/Posts/${id}/comments/?filter=${filter_str}`;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
+/**
+ * Get all comments (not necessarily related to a specific post).
+ */
+function getAllComments(endpoint, params) {
+  return promiseRequest('get', {
+    url: `${endpoint}api/Comments/?filter=${JSON.stringify(params.filter || {})}`
   });
 }
 
@@ -252,7 +274,8 @@ function createPost(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
-      postownerid: params.ownerid
+      postownerid: params.ownerid,
+      postcontainergroupid: groupId
     };
 
     request.post({
@@ -281,7 +304,8 @@ function createComment(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: (new Date()).toUTCString(),
-      commentownerid: params.ownerid
+      commentownerid: params.ownerid,
+      commentcontainerpostid: postId
     };
 
     request.post({
@@ -296,6 +320,14 @@ function createComment(endpoint, params) {
       resolve(res);
     });
   });
+}
+
+function countComments(endpoint, {accessToken, where}) {
+  return promiseRequest('get', `${endpoint}/Comments/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
+}
+
+function countPosts(endpoint, {accessToken, where}) {
+  return promiseRequest('get', `${endpoint}/Posts/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
 
 /**
@@ -325,10 +357,14 @@ export default function CommunityClient(config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
-    listGroups: listGroups.bind(null, config.endpoint),
+    getPosts: getPosts.bind(null, config.endpoint),
+    getComments: getComments.bind(null, config.endpoint),
+    getAllComments: getAllComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
-    createGroup: createGroup.bind(null, config.endpoint)
+    createGroup: createGroup.bind(null, config.endpoint),
+    countComments: countComments.bind(null, config.endpoint),
+    countPosts: countPosts.bind(null, config.endpoint)
   };
 }
