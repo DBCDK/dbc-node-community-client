@@ -360,6 +360,20 @@ function createComment(endpoint, params) {
   });
 }
 
+function countComments(endpoint, _ref11) {
+  var accessToken = _ref11.accessToken;
+  var where = _ref11.where;
+
+  return promiseRequest('get', endpoint + '/Comments/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
+}
+
+function countPosts(endpoint, _ref12) {
+  var accessToken = _ref12.accessToken;
+  var where = _ref12.where;
+
+  return promiseRequest('get', endpoint + '/Posts/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -395,7 +409,9 @@ function CommunityClient() {
     queryGroups: queryGroups.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
-    createGroup: createGroup.bind(null, config.endpoint)
+    createGroup: createGroup.bind(null, config.endpoint),
+    countComments: countComments.bind(null, config.endpoint),
+    countPosts: countPosts.bind(null, config.endpoint)
   };
 }
 
