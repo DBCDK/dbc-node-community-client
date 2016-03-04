@@ -122,6 +122,29 @@ function joinGroup(endpoint, {uid, groupId, accessToken}) {
   });
 }
 
+/**
+ * Lists groups given a filter (no search)
+ * No access restrictions .
+ *
+ * @param endpoint
+ * @param params
+ * @returns {Promise}
+ */
+function listGroups(endpoint, params) {
+  return new Promise((resolve) =>{
+    const filter_str = JSON.stringify(params.filter || []);
+    const url = endpoint + 'api/Groups/?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
 
 function leaveGroup(endpoint, {uid, groupId, accessToken}) {
   return promiseRequest('del', {
