@@ -322,6 +322,14 @@ function createComment(endpoint, params) {
   });
 }
 
+function countComments(endpoint, {accessToken, where}) {
+  return promiseRequest('get', `${endpoint}/Comments/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
+}
+
+function countPosts(endpoint, {accessToken, where}) {
+  return promiseRequest('get', `${endpoint}/Posts/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -355,6 +363,8 @@ export default function CommunityClient(config = null) {
     queryGroups: queryGroups.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
-    createGroup: createGroup.bind(null, config.endpoint)
+    createGroup: createGroup.bind(null, config.endpoint),
+    countComments: countComments.bind(null, config.endpoint),
+    countPosts: countPosts.bind(null, config.endpoint)
   };
 }
