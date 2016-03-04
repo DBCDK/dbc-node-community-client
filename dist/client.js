@@ -160,6 +160,26 @@ function joinGroup(endpoint, _ref9) {
   });
 }
 
+/**
+ * Lists groups given a filter (no search)
+ * No access restrictions .
+ *
+ * @param endpoint
+ * @param params
+ * @returns {Promise}
+ */
+function listGroups(endpoint, params) {
+  return new Promise(function (resolve) {
+    var filter_str = JSON.stringify(params.filter || []);
+    var url = endpoint + 'api/Groups/?filter=' + filter_str;
+    _request2['default'].get({
+      url: url
+    }, function (err, httpResponse) {
+      resolve(httpResponse);
+    });
+  });
+}
+
 function leaveGroup(endpoint, _ref10) {
   var uid = _ref10.uid;
   var groupId = _ref10.groupId;
@@ -403,6 +423,7 @@ function CommunityClient() {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    listGroups: listGroups.bind(null, config.endpoint),
     getPosts: getPosts.bind(null, config.endpoint),
     getComments: getComments.bind(null, config.endpoint),
     getAllComments: getAllComments.bind(null, config.endpoint),
