@@ -96,10 +96,19 @@ function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
  * @param endpoint
  * @param uid
  * @param accessToken
+ * @param profileFilter
  */
-function getFullProfile(endpoint, {uid, accessToken}) {
+function getFullProfile(endpoint, {uid, accessToken, profileFilter}) {
+  let filter = {
+    include: ['image']
+  };
+
+  if (profileFilter) {
+    filter = Object.assign(filter, profileFilter);
+  }
+
   return promiseRequest('get', {
-    url: endpoint + 'api/Profiles/' + uid + '?filter=%7B%22include%22%3A%5B%22image%22%5D%7D&access_token=' + accessToken
+    url: endpoint + 'api/Profiles/' + uid + '?filter=' + encodeURIComponent(JSON.stringify(filter)) + '&access_token=' + accessToken
   });
 }
 
