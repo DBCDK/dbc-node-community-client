@@ -394,6 +394,13 @@ function countPosts(endpoint, _ref12) {
   return promiseRequest('get', endpoint + 'api/Posts/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
+function countGroups(endpoint, _ref13) {
+  var accessToken = _ref13.accessToken;
+  var where = _ref13.where;
+
+  return promiseRequest('get', endpoint + 'api/Groups/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -432,6 +439,7 @@ function CommunityClient() {
     createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
     countComments: countComments.bind(null, config.endpoint),
+    countGroups: countGroups.bind(null, config.endpoint),
     countPosts: countPosts.bind(null, config.endpoint)
   };
 }
