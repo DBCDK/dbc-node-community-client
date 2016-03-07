@@ -122,6 +122,29 @@ function joinGroup(endpoint, {uid, groupId, accessToken}) {
   });
 }
 
+/**
+ * Lists groups given a filter (no search)
+ * No access restrictions .
+ *
+ * @param endpoint
+ * @param params
+ * @returns {Promise}
+ */
+function listGroups(endpoint, params) {
+  return new Promise((resolve) =>{
+    const filter_str = JSON.stringify(params.filter || []);
+    const url = endpoint + 'api/Groups/?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
 
 function leaveGroup(endpoint, {uid, groupId, accessToken}) {
   return promiseRequest('del', {
@@ -363,6 +386,7 @@ export default function CommunityClient(config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    listGroups: listGroups.bind(null, config.endpoint),
     getPosts: getPosts.bind(null, config.endpoint),
     getComments: getComments.bind(null, config.endpoint),
     getAllComments: getAllComments.bind(null, config.endpoint),
