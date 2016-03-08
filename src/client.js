@@ -60,6 +60,13 @@ function updateProfile(endpoint, {uid, profile, accessToken}) {
   });
 }
 
+function removeImage(endpoint, {imageId, accessToken}) {
+  return promiseRequest('del', {
+    url: `${endpoint}api/ImageCollections/${imageId}?access_token=${accessToken}`
+  });
+}
+
+
 function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
   let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
@@ -262,8 +269,9 @@ function getComments(endpoint, params) {
  * Get all comments (not necessarily related to a specific post).
  */
 function getAllComments(endpoint, params) {
+  const filter = JSON.stringify(params.filter || {});
   return promiseRequest('get', {
-    url: `${endpoint}api/Comments/?filter=${JSON.stringify(params.filter || {})}`
+    url: `${endpoint}api/Comments/?filter=${filter}`
   });
 }
 
@@ -296,7 +304,7 @@ function createPost(endpoint, params) {
     const postBody = {
       title: params.title,
       content: params.content,
-      timeCreated: (new Date()).toUTCString(),
+      timeCreated: params.timeCreated,
       postownerid: params.ownerid,
       postcontainergroupid: groupId,
       groupid: groupId,
@@ -330,7 +338,7 @@ function createComment(endpoint, params) {
     const postBody = {
       title: params.title,
       content: params.content,
-      timeCreated: (new Date()).toUTCString(),
+      timeCreated: params.timeCreated,
       commentownerid: params.ownerid,
       commentcontainerpostid: postId,
       postid: postId,
@@ -380,6 +388,7 @@ export default function CommunityClient(config = null) {
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
     updateImage: updateImage.bind(null, config.endpoint),
+    removeImage: removeImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
     getImage: getImage.bind(null, config.endpoint),
     getResizedImage: getResizedImage.bind(null, config.endpoint),
