@@ -426,6 +426,41 @@ function countGroups(endpoint, _ref14) {
 }
 
 /**
+ * Flag a Post
+ */
+function flagPost(endpoint, params) {
+  return new Promise(function (resolve, reject) {
+
+    var accessToken = params.accessToken;
+    var postId = params.postId;
+    var ownerId = params.flagger;
+    var description = params.description;
+
+    // Create flag
+    var url = endpoint + 'api/Flags?access_token=' + accessToken;
+    var flagPostBody = {
+      timeFlagged: Date.now(),
+      description: description,
+      markedAsRead: false,
+      ownerId: ownerId,
+      postFlagsId: postId
+    };
+
+    // create flag
+    _request2['default'].post({
+      url: url,
+      json: true,
+      body: flagPostBody
+    }, function (err, res) {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -460,6 +495,7 @@ function CommunityClient() {
     getComments: getComments.bind(null, config.endpoint),
     getAllComments: getAllComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
+    flagPost: flagPost.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
