@@ -414,6 +414,77 @@ function flagPost(endpoint, params) {
 }
 
 /**
+ * Flag a Comment
+ */
+function flagComment(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const commentId = params.commentId;
+    const ownerId = params.flagger;
+    const description = params.description;
+
+    // Create flag
+    const url = endpoint + 'api/Flags?access_token=' + accessToken;
+    const flagCommentBody = {
+      timeFlagged: Date.now(),
+      description,
+      markedAsRead: false,
+      ownerId,
+      commentFlagsId: commentId
+    };
+
+    // create flag
+    request.post({
+      url,
+      json: true,
+      body: flagCommentBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+
+/**
+ * Flag a Group
+ */
+function flagGroup(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const groupId = params.groupId;
+    const ownerId = params.flagger;
+    const description = params.description;
+
+    // Create flag
+    const url = endpoint + 'api/Flags?access_token=' + accessToken;
+    const flagGroupBody = {
+      timeFlagged: Date.now(),
+      description,
+      markedAsRead: false,
+      ownerId,
+      groupFlagsId: groupId
+    };
+
+    // create flag
+    request.post({
+      url,
+      json: true,
+      body: flagGroupBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -447,6 +518,8 @@ export default function CommunityClient(config = null) {
     getAllComments: getAllComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
     flagPost: flagPost.bind(null, config.endpoint),
+    flagComment: flagComment.bind(null, config.endpoint),
+    flagGroup: flagGroup.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
