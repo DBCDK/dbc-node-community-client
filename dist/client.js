@@ -84,11 +84,20 @@ function updateProfile(endpoint, _ref4) {
   });
 }
 
-function updateImage(endpoint, _ref5) {
-  var image = _ref5.image;
-  var relationId = _ref5.relationId;
-  var relationType = _ref5.relationType;
+function removeImage(endpoint, _ref5) {
+  var imageId = _ref5.imageId;
   var accessToken = _ref5.accessToken;
+
+  return promiseRequest('del', {
+    url: endpoint + 'api/ImageCollections/' + imageId + '?access_token=' + accessToken
+  });
+}
+
+function updateImage(endpoint, _ref6) {
+  var image = _ref6.image;
+  var relationId = _ref6.relationId;
+  var relationType = _ref6.relationType;
+  var accessToken = _ref6.accessToken;
 
   var fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
@@ -124,10 +133,10 @@ function updateImage(endpoint, _ref5) {
  * @param accessToken
  * @param profileFilter
  */
-function getFullProfile(endpoint, _ref6) {
-  var uid = _ref6.uid;
-  var accessToken = _ref6.accessToken;
-  var profileFilter = _ref6.profileFilter;
+function getFullProfile(endpoint, _ref7) {
+  var uid = _ref7.uid;
+  var accessToken = _ref7.accessToken;
+  var profileFilter = _ref7.profileFilter;
 
   var filter = {
     include: ['image']
@@ -142,27 +151,27 @@ function getFullProfile(endpoint, _ref6) {
   });
 }
 
-function getImage(endpoint, _ref7) {
-  var id = _ref7.id;
+function getImage(endpoint, _ref8) {
+  var id = _ref8.id;
 
   return promiseRequest('get', {
     url: endpoint + 'api/files/' + id
   });
 }
 
-function getResizedImage(endpoint, _ref8) {
-  var id = _ref8.id;
-  var size = _ref8.size;
+function getResizedImage(endpoint, _ref9) {
+  var id = _ref9.id;
+  var size = _ref9.size;
 
   return promiseRequest('get', {
     url: endpoint + 'api/imageCollections/' + id + '/download/' + size
   });
 }
 
-function joinGroup(endpoint, _ref9) {
-  var uid = _ref9.uid;
-  var groupId = _ref9.groupId;
-  var accessToken = _ref9.accessToken;
+function joinGroup(endpoint, _ref10) {
+  var uid = _ref10.uid;
+  var groupId = _ref10.groupId;
+  var accessToken = _ref10.accessToken;
 
   return promiseRequest('put', {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
@@ -190,10 +199,10 @@ function listGroups(endpoint, params) {
   });
 }
 
-function leaveGroup(endpoint, _ref10) {
-  var uid = _ref10.uid;
-  var groupId = _ref10.groupId;
-  var accessToken = _ref10.accessToken;
+function leaveGroup(endpoint, _ref11) {
+  var uid = _ref11.uid;
+  var groupId = _ref11.groupId;
+  var accessToken = _ref11.accessToken;
 
   return promiseRequest('del', {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
@@ -307,8 +316,9 @@ function getComments(endpoint, params) {
  * Get all comments (not necessarily related to a specific post).
  */
 function getAllComments(endpoint, params) {
+  var filter = JSON.stringify(params.filter || {});
   return promiseRequest('get', {
-    url: endpoint + 'api/Comments/?filter=' + JSON.stringify(params.filter || {})
+    url: endpoint + 'api/Comments/?filter=' + filter
   });
 }
 
@@ -337,16 +347,18 @@ function createPost(endpoint, params) {
   return new Promise(function (resolve, reject) {
     var accessToken = params.accessToken;
     var groupId = params.parentId;
-    var url = endpoint + 'api/Groups/' + groupId + '/posts?access_token=' + accessToken;
+    var url = endpoint + 'api/Posts?access_token=' + accessToken;
     var postBody = {
       title: params.title,
       content: params.content,
-      timeCreated: new Date().toUTCString(),
+      timeCreated: params.timeCreated,
       postownerid: params.ownerid,
-      postcontainergroupid: groupId
+      postcontainergroupid: groupId,
+      groupid: groupId,
+      id: params.id || null
     };
 
-    _request2['default'].post({
+    _request2['default'].put({
       url: url,
       json: true,
       body: postBody
@@ -367,16 +379,18 @@ function createComment(endpoint, params) {
   return new Promise(function (resolve, reject) {
     var accessToken = params.accessToken;
     var postId = params.parentId;
-    var url = endpoint + 'api/Posts/' + postId + '/comments?access_token=' + accessToken;
+    var url = endpoint + 'api/Comments?access_token=' + accessToken;
     var postBody = {
       title: params.title,
       content: params.content,
-      timeCreated: new Date().toUTCString(),
+      timeCreated: params.timeCreated,
       commentownerid: params.ownerid,
-      commentcontainerpostid: postId
+      commentcontainerpostid: postId,
+      postid: postId,
+      id: params.id || null
     };
 
-    _request2['default'].post({
+    _request2['default'].put({
       url: url,
       json: true,
       body: postBody
@@ -390,23 +404,23 @@ function createComment(endpoint, params) {
   });
 }
 
-function countComments(endpoint, _ref11) {
-  var accessToken = _ref11.accessToken;
-  var where = _ref11.where;
+function countComments(endpoint, _ref12) {
+  var accessToken = _ref12.accessToken;
+  var where = _ref12.where;
 
   return promiseRequest('get', endpoint + 'api/Comments/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
-function countPosts(endpoint, _ref12) {
-  var accessToken = _ref12.accessToken;
-  var where = _ref12.where;
+function countPosts(endpoint, _ref13) {
+  var accessToken = _ref13.accessToken;
+  var where = _ref13.where;
 
   return promiseRequest('get', endpoint + 'api/Posts/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
-function countGroups(endpoint, _ref13) {
-  var accessToken = _ref13.accessToken;
-  var where = _ref13.where;
+function countGroups(endpoint, _ref14) {
+  var accessToken = _ref14.accessToken;
+  var where = _ref14.where;
 
   return promiseRequest('get', endpoint + 'api/Groups/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
@@ -434,6 +448,7 @@ function CommunityClient() {
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
     updateImage: updateImage.bind(null, config.endpoint),
+    removeImage: removeImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
     getImage: getImage.bind(null, config.endpoint),
     getResizedImage: getResizedImage.bind(null, config.endpoint),
