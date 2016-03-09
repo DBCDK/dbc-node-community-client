@@ -461,6 +461,76 @@ function flagPost(endpoint, params) {
 }
 
 /**
+ * Flag a Comment
+ */
+function flagComment(endpoint, params) {
+  return new Promise(function (resolve, reject) {
+
+    var accessToken = params.accessToken;
+    var commentId = params.commentId;
+    var ownerId = params.flagger;
+    var description = params.description;
+
+    // Create flag
+    var url = endpoint + 'api/Flags?access_token=' + accessToken;
+    var flagCommentBody = {
+      timeFlagged: Date.now(),
+      description: description,
+      markedAsRead: false,
+      ownerId: ownerId,
+      commentFlagsId: commentId
+    };
+
+    // create flag
+    _request2['default'].post({
+      url: url,
+      json: true,
+      body: flagCommentBody
+    }, function (err, res) {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
+ * Flag a Group
+ */
+function flagGroup(endpoint, params) {
+  return new Promise(function (resolve, reject) {
+
+    var accessToken = params.accessToken;
+    var groupId = params.groupId;
+    var ownerId = params.flagger;
+    var description = params.description;
+
+    // Create flag
+    var url = endpoint + 'api/Flags?access_token=' + accessToken;
+    var flagGroupBody = {
+      timeFlagged: Date.now(),
+      description: description,
+      markedAsRead: false,
+      ownerId: ownerId,
+      groupFlagsId: groupId
+    };
+
+    // create flag
+    _request2['default'].post({
+      url: url,
+      json: true,
+      body: flagGroupBody
+    }, function (err, res) {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -496,6 +566,8 @@ function CommunityClient() {
     getAllComments: getAllComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
     flagPost: flagPost.bind(null, config.endpoint),
+    flagComment: flagComment.bind(null, config.endpoint),
+    flagGroup: flagGroup.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
