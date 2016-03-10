@@ -66,7 +66,6 @@ function removeImage(endpoint, {imageId, accessToken}) {
   });
 }
 
-
 function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
   let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
@@ -147,7 +146,7 @@ function joinGroup(endpoint, {uid, groupId, accessToken}) {
  * @returns {Promise}
  */
 function listGroups(endpoint, params) {
-  return new Promise((resolve) =>{
+  return new Promise((resolve) => {
     const filter_str = JSON.stringify(params.filter || []);
     const url = endpoint + 'api/Groups/?filter=' + filter_str;
     request.get(
@@ -160,7 +159,6 @@ function listGroups(endpoint, params) {
     );
   });
 }
-
 
 function leaveGroup(endpoint, {uid, groupId, accessToken}) {
   return promiseRequest('del', {
@@ -304,13 +302,16 @@ function queryGroups(endpoint, params) {
 
 /**
  * Create a Post on a Group
+ *
+ * @param {string} endpoint
+ * @param {Object} params
  */
 function createPost(endpoint, params) {
   return new Promise((resolve, reject) => {
     const accessToken = params.accessToken;
     const groupId = params.parentId;
     const url = endpoint + 'api/Posts?access_token=' + accessToken;
-    const postBody = {
+    let postBody = {
       title: params.title,
       content: params.content,
       timeCreated: params.timeCreated,
@@ -319,6 +320,12 @@ function createPost(endpoint, params) {
       groupid: groupId,
       id: params.id || null
     };
+
+    if (params.video) {
+      postBody.mimetype = params.video.mimetype || null;
+      postBody.videofile = params.video.videofile || null;
+      postBody.container = params.video.container || null;
+    }
 
     request.put({
       url,
@@ -447,7 +454,6 @@ function flagComment(endpoint, params) {
     });
   });
 }
-
 
 /**
  * Flag a Group

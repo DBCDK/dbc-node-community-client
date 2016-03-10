@@ -342,6 +342,9 @@ function queryGroups(endpoint, params) {
 
 /**
  * Create a Post on a Group
+ *
+ * @param {string} endpoint
+ * @param {Object} params
  */
 function createPost(endpoint, params) {
   return new Promise(function (resolve, reject) {
@@ -357,6 +360,12 @@ function createPost(endpoint, params) {
       groupid: groupId,
       id: params.id || null
     };
+
+    if (params.video) {
+      postBody.mimetype = params.video.mimetype || null;
+      postBody.videofile = params.video.videofile || null;
+      postBody.container = params.video.container || null;
+    }
 
     _request2['default'].put({
       url: url,
