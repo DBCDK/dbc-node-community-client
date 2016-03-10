@@ -301,9 +301,8 @@ function getPosts(endpoint, params) {
  */
 function getComments(endpoint, params) {
   return new Promise(function (resolve) {
-    var id = params.id;
     var filter_str = JSON.stringify(params.filter || {});
-    var url = endpoint + 'api/Posts/' + id + '/comments/?filter=' + filter_str;
+    var url = endpoint + 'api/Comments/?filter=' + filter_str;
     _request2['default'].get({
       url: url
     }, function (err, httpResponse) {
