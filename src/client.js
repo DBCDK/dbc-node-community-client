@@ -258,9 +258,8 @@ function getPosts(endpoint, params) {
  */
 function getComments(endpoint, params) {
   return new Promise((resolve) => {
-    const id = params.id;
     const filter_str = JSON.stringify(params.filter || {});
-    const url = `${endpoint}api/Posts/${id}/comments/?filter=${filter_str}`;
+    const url = `${endpoint}api/Comments/?filter=${filter_str}`;
     request.get(
       {
         url: url
