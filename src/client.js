@@ -489,6 +489,75 @@ function flagGroup(endpoint, params) {
   });
 }
 
+
+/**
+ * Like a post
+ */
+function likePost(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const profileId = params.profileId;
+    const postId = params.postId;
+    const value = '1'; //  like=1, dislike=-1
+
+    const url = endpoint + 'api/Posts/' + postId + '/likes?access_token=' + accessToken;
+    const likePostBody = {
+      value,
+      profileId
+    };
+
+    const requestParams = {
+      url,
+      json: true,
+      body: likePostBody
+    };
+
+    // create like
+    request.post(requestParams, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+
+/**
+ * unlike a post
+ */
+function unlikePost(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const profileId = params.profileId;
+    const postId = params.postId;
+    const value = '1'; //  like=1, dislike=-1
+
+    const url = endpoint + 'api/Posts/' + postId + '/likes?access_token=' + accessToken;
+    const likePostBody = {
+      value,
+      profileId
+    };
+
+    const requestParams = {
+      url,
+      json: true,
+      body: likePostBody
+    };
+
+    // create like
+    request.del(requestParams, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -530,6 +599,8 @@ export default function CommunityClient(config = null) {
     createGroup: createGroup.bind(null, config.endpoint),
     countComments: countComments.bind(null, config.endpoint),
     countGroups: countGroups.bind(null, config.endpoint),
-    countPosts: countPosts.bind(null, config.endpoint)
+    countPosts: countPosts.bind(null, config.endpoint),
+    likePost: likePost.bind(null, config.endpoint),
+    unlikePost: unlikePost.bind(null, config.endpoint)
   };
 }
