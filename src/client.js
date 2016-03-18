@@ -547,8 +547,6 @@ function unlikePost(endpoint, params) {
       body: likePostBody
     };
 
-    console.log('client request params', requestParams);
-
     // create like
     request.del(requestParams, (err, res) => {
       if (err) {
