@@ -286,7 +286,7 @@ function updateGroup(endpoint, {groupId, name, description, colour, coverImage, 
           }
         }).then((updatedFileResult) => {
           createResult.body.file = updatedFileResult.body;
-          return Promise.resolve(createResult);
+          return Promise.resolve(createResult.body);
         });
       }
 

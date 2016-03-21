@@ -343,7 +343,7 @@ function updateGroup(endpoint, _ref12) {
           }
         }).then(function (updatedFileResult) {
           createResult.body.file = updatedFileResult.body;
-          return Promise.resolve(createResult);
+          return Promise.resolve(createResult.body);
         });
       }
 
