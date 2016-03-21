@@ -267,6 +267,92 @@ function createGroup(endpoint, params) {
 }
 
 /**
+ * Function to update a group.
+ * @param endpoint
+ * @param groupId
+ * @param name
+ * @param description
+ * @param colour
+ * @param coverImage
+ * @param uid
+ * @param accessToken
+ */
+function updateGroup(endpoint, _ref12) {
+  var groupId = _ref12.groupId;
+  var name = _ref12.name;
+  var description = _ref12.description;
+  var colour = _ref12.colour;
+  var coverImage = _ref12.coverImage;
+  var uid = _ref12.uid;
+  var accessToken = _ref12.accessToken;
+
+  if (!accessToken) {
+    return Promise.reject('Please provide an access token!');
+  }
+
+  return promiseRequest('get', {
+    url: endpoint + 'api/Groups/' + groupId + '?access_token=' + accessToken,
+    json: true
+  }).then(function (groupGetResponse) {
+    var group = groupGetResponse.body;
+    if (group.groupownerid !== uid) {
+      return Promise.reject('User does not own the group!');
+    }
+
+    var promises = [];
+
+    promises.push(promiseRequest('put', {
+      url: endpoint + 'api/Groups/' + groupId + '?access_token=' + accessToken,
+      json: true,
+      body: {
+        name: name,
+        description: description,
+        colour: colour
+      }
+    }));
+
+    if (coverImage) {
+      var fileExtension = coverImage.originalname.split('.');
+      fileExtension = fileExtension[fileExtension.length - 1];
+      var fileName = _nodeUuid2['default'].v4().replace('-', '') + '.' + fileExtension;
+
+      promises.push(promiseRequest('post', {
+        url: endpoint + 'api/ImageCollections/upload?access_token=' + accessToken + '&container=uxdev-biblo-imagebucket',
+        formData: {
+          file: {
+            value: coverImage.buffer,
+            options: {
+              contentType: coverImage.mimetype,
+              filename: fileName
+            }
+          }
+        }
+      }));
+    }
+
+    return Promise.all(promises).then(function (promiseResponses) {
+      var createResult = promiseResponses[0];
+
+      if (promiseResponses[1]) {
+        var fileResult = JSON.parse(promiseResponses[1].body);
+        return promiseRequest('put', {
+          url: endpoint + 'api/ImageCollections/' + fileResult.id + '?access_token=' + accessToken,
+          json: true,
+          body: {
+            groupCoverImageCollectionId: createResult.body.id
+          }
+        }).then(function (updatedFileResult) {
+          createResult.body.file = updatedFileResult.body;
+          return Promise.resolve(createResult);
+        });
+      }
+
+      return Promise.resolve(createResult.body);
+    });
+  });
+}
+
+/**
  * Fetches a Group in Loopback
  */
 function getGroup(endpoint, params) {
@@ -412,23 +498,23 @@ function createComment(endpoint, params) {
   });
 }
 
-function countComments(endpoint, _ref12) {
-  var accessToken = _ref12.accessToken;
-  var where = _ref12.where;
+function countComments(endpoint, _ref13) {
+  var accessToken = _ref13.accessToken;
+  var where = _ref13.where;
 
   return promiseRequest('get', endpoint + 'api/Comments/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
-function countPosts(endpoint, _ref13) {
-  var accessToken = _ref13.accessToken;
-  var where = _ref13.where;
+function countPosts(endpoint, _ref14) {
+  var accessToken = _ref14.accessToken;
+  var where = _ref14.where;
 
   return promiseRequest('get', endpoint + 'api/Posts/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
-function countGroups(endpoint, _ref14) {
-  var accessToken = _ref14.accessToken;
-  var where = _ref14.where;
+function countGroups(endpoint, _ref15) {
+  var accessToken = _ref15.accessToken;
+  var where = _ref15.where;
 
   return promiseRequest('get', endpoint + 'api/Groups/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
@@ -645,6 +731,7 @@ function CommunityClient() {
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
+    updateGroup: updateGroup.bind(null, config.endpoint),
     countComments: countComments.bind(null, config.endpoint),
     countGroups: countGroups.bind(null, config.endpoint),
     countPosts: countPosts.bind(null, config.endpoint),
