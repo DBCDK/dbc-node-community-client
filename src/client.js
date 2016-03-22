@@ -219,16 +219,17 @@ function createGroup(endpoint, params) {
 
 /**
  * Function to update a group.
- * @param endpoint
- * @param groupId
- * @param name
- * @param description
- * @param colour
- * @param coverImage
- * @param uid
- * @param accessToken
+ * @param endpoint {string}
+ * @param groupId {int}
+ * @param name {string}
+ * @param description {string}
+ * @param colour {string}
+ * @param coverImage {file}
+ * @param uid {int}
+ * @param accessToken {string}
+ * @param isModerator {boolean}
  */
-function updateGroup(endpoint, {groupId, name, description, colour, coverImage, uid, accessToken}) {
+function updateGroup(endpoint, {groupId, name, description, colour, coverImage, uid, accessToken, isModerator}) {
   if (!accessToken) {
     return Promise.reject('Please provide an access token!');
   }
@@ -238,7 +239,7 @@ function updateGroup(endpoint, {groupId, name, description, colour, coverImage, 
     json: true
   }).then((groupGetResponse) => {
     const group = groupGetResponse.body;
-    if (group.groupownerid !== uid) {
+    if (!isModerator && group.groupownerid !== uid) {
       return Promise.reject('User does not own the group!');
     }
 
