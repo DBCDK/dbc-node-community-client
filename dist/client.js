@@ -692,6 +692,10 @@ function unlikePost(endpoint, params) {
   });
 }
 
+function checkIfProfileIsQuarantined(endpoint, id) {
+  return promiseRequest('get', { url: endpoint + 'api/Quarantines/' + id + '/check-if-profile-is-quarantined' });
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -711,6 +715,7 @@ function CommunityClient() {
   return {
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
     checkIfDisplayNameIsTaken: checkIfDisplayNameIsTaken.bind(null, config.endpoint),
+    checkIfProfileIsQuarantined: checkIfProfileIsQuarantined.bind(null, config.endpoint),
     loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
