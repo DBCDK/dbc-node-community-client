@@ -697,6 +697,37 @@ function checkIfProfileIsQuarantined(endpoint, id) {
 }
 
 /**
+ * Mark a post as deleted
+ */
+function markPostAsDeleted(endpoint, params) {
+  return new Promise(function (resolve, reject) {
+
+    var accessToken = params.accessToken;
+    var postId = params.id;
+
+    var url = endpoint + 'api/Posts/' + postId + '?access_token=' + accessToken;
+
+    var deletePostBody = {
+      markedAsDeleted: true
+    };
+
+    var requestParams = {
+      url: url,
+      json: true,
+      body: deletePostBody
+    };
+
+    // create like
+    _request2['default'].put(requestParams, function (err, res) {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -743,7 +774,8 @@ function CommunityClient() {
     countGroups: countGroups.bind(null, config.endpoint),
     countPosts: countPosts.bind(null, config.endpoint),
     likePost: likePost.bind(null, config.endpoint),
-    unlikePost: unlikePost.bind(null, config.endpoint)
+    unlikePost: unlikePost.bind(null, config.endpoint),
+    markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint)
   };
 }
 
