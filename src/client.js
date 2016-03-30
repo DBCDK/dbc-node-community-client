@@ -653,7 +653,7 @@ function markPostAsDeleted(endpoint, params) {
     const url = endpoint + 'api/Posts/' + postId + '?access_token=' + accessToken;
 
     const deletePostBody = {
-      "markedAsDeleted": true
+      markedAsDeleted: true
     };
 
     const requestParams = {
