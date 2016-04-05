@@ -436,6 +436,12 @@ function createComment(endpoint, params) {
       postid: postId,
       id: params.id || null
     };
+    
+    if (params.video) {
+      postBody.mimetype = params.video.mimetype || null;
+      postBody.videofile = params.video.videofile || null;
+      postBody.container = params.video.container || null;
+    }
 
     request.put({
       url,
