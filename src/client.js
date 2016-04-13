@@ -678,6 +678,73 @@ function markPostAsDeleted(endpoint, params) {
   });
 }
 
+function getReviews(endpoint, params) {
+  return new Promise((resolve) => {
+    const url = endpoint + 'api/reviews/' + params.id;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
+function createReview(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const url = endpoint + 'api/reviews?';
+    const postBody = {
+      pid: params.pid,
+      content: params.content,
+      created: params.created,
+      modified: params.modified,
+      worktype: params.worktype,
+      reviewownerid: params.reviewownerid,
+      rating: params.rating,
+      id: params.id
+    };
+    
+    request.post({
+      url,
+      json: true,
+      body: postBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+function updateReview(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const url = endpoint + 'api/reviews?';
+    const postBody = {
+      id: params.id,
+      pid: params.pid,
+      content: params.content,
+      created: params.created,
+      modified: params.modified,
+      reviewownerid: params.ownerid,
+      rating: params.rating
+    };
+    
+    request.put({
+      url,
+      json: true,
+      body: postBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
 
 /**
  * Setting the necessary paramerters for the client to be usable.
@@ -725,6 +792,9 @@ export default function CommunityClient(config = null) {
     countPosts: countPosts.bind(null, config.endpoint),
     likePost: likePost.bind(null, config.endpoint),
     unlikePost: unlikePost.bind(null, config.endpoint),
-    markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint)
+    markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint),
+    getReviews: getReviews.bind(null, config.endpoint),
+    createReview: createReview.bind(null, config.endpoint),
+    updateReview: updateReview.bind(null, config.endpoint)
   };
 }
