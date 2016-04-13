@@ -165,6 +165,12 @@ function getResizedImage(endpoint, _ref9) {
 
   return promiseRequest('get', {
     url: endpoint + 'api/imageCollections/' + id + '/download/' + size
+  }).then(function (httpResponse) {
+    if (httpResponse && httpResponse.statusCode !== 200) {
+      return Promise.reject(httpResponse.statusCode, httpResponse);
+    }
+
+    return Promise.resolve(httpResponse);
   });
 }
 
