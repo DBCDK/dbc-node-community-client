@@ -686,7 +686,8 @@ function markPostAsDeleted(endpoint, params) {
 
 function getReviews(endpoint, params) {
   return new Promise((resolve) => {
-    const url = endpoint + 'api/reviews/' + params.id;
+    const filter_str = JSON.stringify(params.filter || []);
+    const url = endpoint + 'api/reviews/?filter=' + filter_str;
     request.get(
       {
         url: url
@@ -702,52 +703,48 @@ function createReview(endpoint, params) {
   return new Promise((resolve, reject) => {
     const url = endpoint + 'api/reviews?';
     const postBody = {
+      id: params.id || null,
       pid: params.pid,
+      libraryid: params.libraryid,
       content: params.content,
       created: params.created,
       modified: params.modified,
       worktype: params.worktype,
       reviewownerid: params.reviewownerid,
       rating: params.rating,
-      id: params.id
+      image: params.image
     };
-    
-    request.post({
-      url,
-      json: true,
-      body: postBody
-    }, (err, res) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(res);
-    });
-  });
-}
 
-function updateReview(endpoint, params) {
-  return new Promise((resolve, reject) => {
-    const url = endpoint + 'api/reviews?';
-    const postBody = {
-      id: params.id,
-      pid: params.pid,
-      content: params.content,
-      created: params.created,
-      modified: params.modified,
-      reviewownerid: params.ownerid,
-      rating: params.rating
-    };
-    
-    request.put({
-      url,
-      json: true,
-      body: postBody
-    }, (err, res) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(res);
-    });
+    if (params.video) {
+      postBody.mimetype = params.video.mimetype || null;
+      postBody.videofile = params.video.videofile || null;
+      postBody.container = params.video.container || null;
+    }
+
+    if (params.id) {
+      request.put({
+        url,
+        json: true,
+        body: postBody
+      }, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res);
+      });
+    }
+    else {
+      request.post({
+        url,
+        json: true,
+        body: postBody
+      }, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res);
+      });
+    }
   });
 }
 
@@ -800,7 +797,6 @@ export default function CommunityClient(config = null) {
     unlikePost: unlikePost.bind(null, config.endpoint),
     markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint),
     getReviews: getReviews.bind(null, config.endpoint),
-    createReview: createReview.bind(null, config.endpoint),
-    updateReview: updateReview.bind(null, config.endpoint)
+    createReview: createReview.bind(null, config.endpoint)
   };
 }
