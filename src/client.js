@@ -580,6 +580,40 @@ function flagGroup(endpoint, params) {
   });
 }
 
+/**
+ * Flag a Review 
+ */
+function flagReview(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const reviewId = params.reviewId;
+    const ownerId = params.flagger;
+    const description = params.description;
+
+    // Create flag
+    const url = endpoint + 'api/Flags?access_token=' + accessToken;
+    const reviewGroupBody = {
+      timeFlagged: Date.now(),
+      description,
+      markedAsRead: false,
+      ownerId,
+      reviewFlagsId: reviewId
+    };
+
+    // create flag
+    request.post({
+      url,
+      json: true,
+      body: reviewGroupBody
+    }, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
 
 /**
  * Like a post
@@ -593,6 +627,39 @@ function likePost(endpoint, params) {
     const value = '1'; //  like=1, dislike=-1
 
     const url = endpoint + 'api/Posts/' + postId + '/likes?access_token=' + accessToken;
+    const likePostBody = {
+      value,
+      profileId
+    };
+
+    const requestParams = {
+      url,
+      json: true,
+      body: likePostBody
+    };
+
+    // create like
+    request.post(requestParams, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+/**
+ * Like a review
+ */
+function likeReview(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const profileId = params.profileId;
+    const reviewId = params.reviewId;
+    const value = '1'; //  like=1, dislike=-1
+
+    const url = endpoint + 'api/reviews/' + reviewId + '/likes?access_token=' + accessToken;
     const likePostBody = {
       value,
       profileId
@@ -648,6 +715,39 @@ function unlikePost(endpoint, params) {
   });
 }
 
+/**
+ * unlike a review 
+ */
+function unlikeReview(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const profileId = params.profileId;
+    const reviewId = params.reviewId;
+    const value = '1'; //  like=1, dislike=-1
+
+    const url = endpoint + 'api/reviews/' + reviewId + '/likes?access_token=' + accessToken;
+    const likeReviewBody = {
+      value,
+      profileId
+    };
+
+    const requestParams = {
+      url,
+      json: true,
+      body: likeReviewBody
+    };
+
+    // create like
+    request.del(requestParams, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
 
 function checkIfProfileIsQuarantined(endpoint, id) {
   return promiseRequest('get', {url: `${endpoint}api/Quarantines/${id}/check-if-profile-is-quarantined`});
@@ -681,6 +781,70 @@ function markPostAsDeleted(endpoint, params) {
       }
       resolve(res);
     });
+  });
+}
+
+function getReviews(endpoint, params) {
+  return new Promise((resolve) => {
+    const filter_str = JSON.stringify(params.filter || []);
+    const url = endpoint + 'api/reviews/?filter=' + filter_str;
+    request.get(
+      {
+        url: url
+      },
+      (err, httpResponse) => {
+        resolve(httpResponse);
+      }
+    );
+  });
+}
+
+function createReview(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const url = endpoint + 'api/reviews?';
+    const postBody = {
+      id: params.id || null,
+      pid: params.pid,
+      libraryid: params.libraryid,
+      content: params.content,
+      created: params.created,
+      modified: params.modified,
+      worktype: params.worktype,
+      reviewownerid: params.reviewownerid,
+      rating: params.rating,
+      image: params.image
+    };
+
+    if (params.video) {
+      postBody.mimetype = params.video.mimetype || null;
+      postBody.videofile = params.video.videofile || null;
+      postBody.container = params.video.container || null;
+    }
+
+    if (params.id) {
+      request.put({
+        url,
+        json: true,
+        body: postBody
+      }, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res);
+      });
+    }
+    else {
+      request.post({
+        url,
+        json: true,
+        body: postBody
+      }, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res);
+      });
+    }
   });
 }
 
@@ -722,6 +886,7 @@ export default function CommunityClient(config = null) {
     flagPost: flagPost.bind(null, config.endpoint),
     flagComment: flagComment.bind(null, config.endpoint),
     flagGroup: flagGroup.bind(null, config.endpoint),
+    flagReview: flagReview.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
@@ -730,7 +895,11 @@ export default function CommunityClient(config = null) {
     countGroups: countGroups.bind(null, config.endpoint),
     countPosts: countPosts.bind(null, config.endpoint),
     likePost: likePost.bind(null, config.endpoint),
+    likeReview: likeReview.bind(null, config.endpoint),
     unlikePost: unlikePost.bind(null, config.endpoint),
-    markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint)
+    unlikeReview: unlikeReview.bind(null, config.endpoint),
+    markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint),
+    getReviews: getReviews.bind(null, config.endpoint),
+    createReview: createReview.bind(null, config.endpoint)
   };
 }
