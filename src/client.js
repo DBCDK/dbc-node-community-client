@@ -475,6 +475,10 @@ function countGroups(endpoint, {accessToken, where}) {
   return promiseRequest('get', `${endpoint}api/Groups/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
 
+function countReviews(endpoint, {$accessToken, where}) {
+  return promiseRequest('get', `${endpoint}api/reviews/count?where=${JSON.stringify(where)}`);
+}
+
 /**
  * Flag a Post
  */
@@ -894,6 +898,7 @@ export default function CommunityClient(config = null) {
     countComments: countComments.bind(null, config.endpoint),
     countGroups: countGroups.bind(null, config.endpoint),
     countPosts: countPosts.bind(null, config.endpoint),
+    countReviews: countReviews.bind(null, config.endpoint),
     likePost: likePost.bind(null, config.endpoint),
     likeReview: likeReview.bind(null, config.endpoint),
     unlikePost: unlikePost.bind(null, config.endpoint),
