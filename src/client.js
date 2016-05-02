@@ -788,6 +788,38 @@ function markPostAsDeleted(endpoint, params) {
   });
 }
 
+/**
+ * Mark a reviewt as deleted
+ */
+function markReviewAsDeleted(endpoint, params) {
+  return new Promise((resolve, reject) => {
+
+    const accessToken = params.accessToken;
+    const reviewId = params.id;
+
+    const url = endpoint + 'api/reviews/' + reviewId + '?access_token=' + accessToken;
+
+    const deletePostBody = {
+      markedAsDeleted: true
+    };
+
+    const requestParams = {
+      url,
+      json: true,
+      body: deletePostBody
+    };
+
+    // create like
+    request.put(requestParams, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
+
 function getReviews(endpoint, params) {
   return new Promise((resolve) => {
     const filter_str = JSON.stringify(params.filter || []);
@@ -904,6 +936,7 @@ export default function CommunityClient(config = null) {
     unlikePost: unlikePost.bind(null, config.endpoint),
     unlikeReview: unlikeReview.bind(null, config.endpoint),
     markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint),
+    markReviewAsDeleted: markReviewAsDeleted.bind(null, config.endpoint),
     getReviews: getReviews.bind(null, config.endpoint),
     createReview: createReview.bind(null, config.endpoint)
   };
