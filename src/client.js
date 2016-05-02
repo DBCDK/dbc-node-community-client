@@ -475,8 +475,8 @@ function countGroups(endpoint, {accessToken, where}) {
   return promiseRequest('get', `${endpoint}api/Groups/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
 
-function countReviews(endpoint, {$accessToken, where}) {
-  return promiseRequest('get', `${endpoint}api/reviews/count?where=${JSON.stringify(where)}`);
+function countReviews(endpoint, {accessToken, where}) {
+  return promiseRequest('get', `${endpoint}api/reviews/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
 
 /**
