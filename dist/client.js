@@ -533,6 +533,13 @@ function countGroups(endpoint, _ref15) {
   return promiseRequest('get', endpoint + 'api/Groups/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
 }
 
+function countReviews(endpoint, _ref16) {
+  var accessToken = _ref16.accessToken;
+  var where = _ref16.where;
+
+  return promiseRequest('get', endpoint + 'api/reviews/count?access_token=' + accessToken + (where ? '&where=' + JSON.stringify(where) : ''));
+}
+
 /**
  * Flag a Post
  */
@@ -840,6 +847,37 @@ function markPostAsDeleted(endpoint, params) {
   });
 }
 
+/**
+ * Mark a reviewt as deleted
+ */
+function markReviewAsDeleted(endpoint, params) {
+  return new Promise(function (resolve, reject) {
+
+    var accessToken = params.accessToken;
+    var reviewId = params.id;
+
+    var url = endpoint + 'api/reviews/' + reviewId + '?access_token=' + accessToken;
+
+    var deletePostBody = {
+      markedAsDeleted: true
+    };
+
+    var requestParams = {
+      url: url,
+      json: true,
+      body: deletePostBody
+    };
+
+    // create like
+    _request2['default'].put(requestParams, function (err, res) {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
 function getReviews(endpoint, params) {
   return new Promise(function (resolve) {
     var filter_str = JSON.stringify(params.filter || []);
@@ -947,11 +985,13 @@ function CommunityClient() {
     countComments: countComments.bind(null, config.endpoint),
     countGroups: countGroups.bind(null, config.endpoint),
     countPosts: countPosts.bind(null, config.endpoint),
+    countReviews: countReviews.bind(null, config.endpoint),
     likePost: likePost.bind(null, config.endpoint),
     likeReview: likeReview.bind(null, config.endpoint),
     unlikePost: unlikePost.bind(null, config.endpoint),
     unlikeReview: unlikeReview.bind(null, config.endpoint),
     markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint),
+    markReviewAsDeleted: markReviewAsDeleted.bind(null, config.endpoint),
     getReviews: getReviews.bind(null, config.endpoint),
     createReview: createReview.bind(null, config.endpoint)
   };
