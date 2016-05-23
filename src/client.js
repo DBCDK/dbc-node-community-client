@@ -402,6 +402,7 @@ function createPost(endpoint, params) {
       postownerid: params.ownerid,
       postcontainergroupid: groupId,
       groupid: groupId,
+      attachedReviewId: params.attachedReviewId,
       id: params.id || null
     };
 
@@ -437,6 +438,7 @@ function createComment(endpoint, params) {
       title: params.title,
       content: params.content,
       timeCreated: params.timeCreated,
+      attachedReviewId: params.attachedReviewId,
       commentownerid: params.ownerid,
       commentcontainerpostid: postId,
       postid: postId,
