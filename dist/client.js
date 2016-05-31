@@ -940,6 +940,15 @@ function createReview(endpoint, params) {
   });
 }
 
+function checkForMemberInGroup(endpoint, _ref17) {
+  var groupId = _ref17.groupId;
+  var profileId = _ref17.profileId;
+
+  return promiseRequest('get', {
+    url: endpoint + 'api/Groups/' + groupId + '/members/' + profileId
+  });
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -995,6 +1004,7 @@ function CommunityClient() {
     markPostAsDeleted: markPostAsDeleted.bind(null, config.endpoint),
     markReviewAsDeleted: markReviewAsDeleted.bind(null, config.endpoint),
     getReviews: getReviews.bind(null, config.endpoint),
+    checkForMemberInGroup: checkForMemberInGroup.bind(null, config.endpoint),
     createReview: createReview.bind(null, config.endpoint)
   };
 }
