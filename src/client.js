@@ -1,7 +1,7 @@
 'use strict';
 
-import request from 'request';
-import uuid from 'node-uuid';
+const request = require('request');
+const uuid = require('node-uuid');
 
 function promiseRequest(method, req) {
   return new Promise((resolve, reject) => {
@@ -892,6 +892,14 @@ function checkForMemberInGroup(endpoint, {groupId, profileId}) {
   });
 }
 
+function getUserQuarantines(endpoint, {uid, filter}) {
+  filter = encodeURIComponent(JSON.stringify(filter || {}));
+
+  return promiseRequest('get', {
+    url: `${endpoint}api/Profiles/${uid}/quarantines?filter=${filter}`
+  });
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -900,7 +908,7 @@ function checkForMemberInGroup(endpoint, {groupId, profileId}) {
  * @param {Object} config Config object with the necessary parameters to use
  * the webservice
  */
-export default function CommunityClient(config = null) {
+module.exports = function CommunityClient(config = null) {
 
   if (!config || !config.endpoint) {
     throw new Error('Expected config object but got null or no endpoint provided');
@@ -946,6 +954,7 @@ export default function CommunityClient(config = null) {
     markReviewAsDeleted: markReviewAsDeleted.bind(null, config.endpoint),
     getReviews: getReviews.bind(null, config.endpoint),
     checkForMemberInGroup: checkForMemberInGroup.bind(null, config.endpoint),
+    getUserQuarantines: getUserQuarantines.bind(null, config.endpoint),
     createReview: createReview.bind(null, config.endpoint)
   };
 }
