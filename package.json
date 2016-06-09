@@ -7,7 +7,7 @@
     "test": "mocha src/__tests__ -R mocha-jenkins-reporter",
     "test:junit": "npm run test",
     "test:watch": "mocha src/__tests__ -w",
-    "build": "npm run cleardest",
+    "build": "npm run cleardest && mkdir ./dist && touch ./dist/empty",
     "cleardest": "rm -rf ./dist",
     "lint": "eslint ./src",
     "lint:checkstyle": "eslint ./src  -o report.xml -f checkstyle",
