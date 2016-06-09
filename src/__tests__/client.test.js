@@ -1,7 +1,10 @@
 'use strict';
 
-import {assert} from 'chai';
-import ProfileClient from '../client.js';
+// import {assert} from 'chai';
+// import ProfileClient from '../client.js';
+
+const assert = require('chai').assert;
+const ProfileClient = require('../client.js');
 
 describe('Test methods in client.js', () => {
   const methods = ProfileClient({endpoint: 'some_url'}); // eslint-disable-line
