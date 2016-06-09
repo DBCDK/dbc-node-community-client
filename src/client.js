@@ -957,4 +957,4 @@ module.exports = function CommunityClient(config = null) {
     getUserQuarantines: getUserQuarantines.bind(null, config.endpoint),
     createReview: createReview.bind(null, config.endpoint)
   };
-}
+};
