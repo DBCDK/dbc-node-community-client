@@ -1,8 +1,5 @@
 'use strict';
 
-// import {assert} from 'chai';
-// import ProfileClient from '../client.js';
-
 const assert = require('chai').assert;
 const ProfileClient = require('../client.js');
 
