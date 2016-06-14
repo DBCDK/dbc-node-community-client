@@ -1,10 +1,10 @@
 'use strict';
 
 const assert = require('chai').assert;
-const ProfileClient = require('../client.js');
+const CommunityClient = require('../client.js');
 
 describe('Test methods in client.js', () => {
-  const methods = ProfileClient({endpoint: 'some_url'}); // eslint-disable-line
+  const methods = CommunityClient({info: () => {}, error: () => {}}, {endpoint: 'some_url'}); // eslint-disable-line
   
   /*
   it('Should ensure createProfile is present', () => {
@@ -41,10 +41,10 @@ describe('Test methods in client.js', () => {
   */
 
   it('Should throw when no config object is provided to init', () => {
-    assert.throws(ProfileClient, Error, 'Expected config object but got null or no endpoint provided');
+    assert.throws(CommunityClient, Error, 'Expected config object but got null or no endpoint provided');
   });
 
   it('Should throw when config object is provided but no endpoint to init', () => {
-    assert.throws(() => ProfileClient({}), Error, 'Expected config object but got null or no endpoint provided');
+    assert.throws(() => CommunityClient({info: () => {}, error: () => {}}, {}), Error, 'Expected config object but got null or no endpoint provided');
   });
 });
