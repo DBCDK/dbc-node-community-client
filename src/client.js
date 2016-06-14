@@ -2,7 +2,79 @@
 
 const request = require('request');
 const uuid = require('node-uuid');
+const http = require('http');
+const url = require('url');
+const forever = require('async/forever');
 
+/**
+ * This is a helper function to create an infinite long polling listener on a change stream
+ * @param {String} endpoint
+ * @param {String} model
+ * @param {Function || Array[Function]} callback
+ * @param {Object} logger
+ * @returns {Promise}
+ */
+function changeStreamListener(endpoint, model, callback, logger) {
+  return new Promise((resolve) => {
+    const opts = url.parse(`${endpoint}api/${model}/change-stream?_format=event-stream`);
+    opts.agent = new http.Agent({keepAlive: true});
+
+    const eventRegex = /^event: ([a-zA-Z]+)/;
+    let currentEvent = 'someunidentifiedevent: ';
+    let resolved = false;
+
+    let cb = callback;
+    if (Array.isArray(callback)) {
+      cb = (err, res) => {
+        callback.forEach((cbf) => cbf(err, res));
+      };
+    }
+
+    forever(retry => {
+      http.get(opts, response => {
+        response.on('data', d => {
+          const dataString = d.toString();
+
+          if (dataString.indexOf(':ok') === 0) {
+            if (!resolved) {
+              resolved = true;
+              resolve({created: true});
+            }
+
+            logger.info(`Started listening to ${model}`);
+          }
+          else if (dataString.indexOf('event: ') === 0) {
+            currentEvent = `${eventRegex.exec(dataString)[1]}: `;
+          }
+          else if (dataString.indexOf(currentEvent) === 0) {
+            const jsonData = JSON.parse(dataString.substring(currentEvent.length));
+            cb(null, jsonData);
+          }
+          else {
+            cb('something weird happened');
+          }
+        });
+
+        response.on('error', error => {
+          logger.error(`got error from ${model} change stream, retrying`, error);
+          retry();
+        });
+
+        response.on('end', () => {
+          logger.info(`${model} stream ended, retrying`);
+          retry();
+        });
+      });
+    });
+  });
+}
+
+/**
+ * A helper function to create a promise which resolves to the http response.
+ * @param {String} method - Method to use when executing the request.
+ * @param {PlainObject} req - Request object that is passed to the request method.
+ * @returns {Promise}
+ */
 function promiseRequest(method, req) {
   return new Promise((resolve, reject) => {
     request[method](req, (err, httpResponse) => {
@@ -901,6 +973,51 @@ function getUserQuarantines(endpoint, {uid, filter}) {
 }
 
 /**
+ * This function creates a listener on quarantines
+ * @param {String} endpoint
+ * @param {Object} logger
+ * @param {Function || Array} callback
+ * @returns {Promise}
+ */
+function listenForNewQuarantines(endpoint, logger, callback) {
+  if (!callback || (typeof callback !== 'function' && !Array.isArray(callback))) {
+    return Promise.reject('Callback needs to be a function!');
+  }
+
+  return changeStreamListener(endpoint, 'Quarantines', callback, logger);
+}
+
+/**
+ * This function creates a change stream listener on posts
+ * @param {String} endpoint
+ * @param {Object} logger
+ * @param {Function || Array} callback
+ * @returns {Promise}
+ */
+function listenForNewPosts(endpoint, logger, callback) {
+  if (!callback || (typeof callback !== 'function' || Array.isArray(callback))) {
+    return Promise.reject('Callback needs to be a function!');
+  }
+
+  return changeStreamListener(endpoint, 'Posts', callback, logger);
+}
+
+/**
+ * This function creates a change stream listener on posts
+ * @param {String} endpoint
+ * @param {Object} logger
+ * @param {Function || Array} callback
+ * @returns {Promise}
+ */
+function listenForNewComments(endpoint, logger, callback) {
+  if (!callback || (typeof callback !== 'function' || Array.isArray(callback))) {
+    return Promise.reject('Callback needs to be a function!');
+  }
+
+  return changeStreamListener(endpoint, 'Comments', callback, logger);
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -908,13 +1025,15 @@ function getUserQuarantines(endpoint, {uid, filter}) {
  * @param {Object} config Config object with the necessary parameters to use
  * the webservice
  */
-module.exports = function CommunityClient(config = null) {
+module.exports = function CommunityClient(logger, config = null) {
 
   if (!config || !config.endpoint) {
     throw new Error('Expected config object but got null or no endpoint provided');
   }
 
   return {
+    listenForNewQuarantines: listenForNewQuarantines.bind(null, config.endpoint, logger),
+    listenForNewPosts: listenForNewPosts.bind(null, config.endpoint, logger),
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
     checkIfDisplayNameIsTaken: checkIfDisplayNameIsTaken.bind(null, config.endpoint),
     checkIfProfileIsQuarantined: checkIfProfileIsQuarantined.bind(null, config.endpoint),
