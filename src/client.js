@@ -995,7 +995,7 @@ function listenForNewQuarantines(endpoint, logger, callback) {
  * @returns {Promise}
  */
 function listenForNewPosts(endpoint, logger, callback) {
-  if (!callback || (typeof callback !== 'function' || Array.isArray(callback))) {
+  if (!callback || (typeof callback !== 'function' && !Array.isArray(callback))) {
     return Promise.reject('Callback needs to be a function!');
   }
 
@@ -1010,7 +1010,7 @@ function listenForNewPosts(endpoint, logger, callback) {
  * @returns {Promise}
  */
 function listenForNewComments(endpoint, logger, callback) {
-  if (!callback || (typeof callback !== 'function' || Array.isArray(callback))) {
+  if (!callback || (typeof callback !== 'function' && !Array.isArray(callback))) {
     return Promise.reject('Callback needs to be a function!');
   }
 
