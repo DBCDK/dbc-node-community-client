@@ -989,7 +989,7 @@ function listenForNewQuarantines(endpoint, logger, callback) {
 
 /**
  * This function creates a change stream listener on posts
- * @param {String} endpoint
+ * @param {String}endpoint
  * @param {Object} logger
  * @param {Function || Array} callback
  * @returns {Promise}
@@ -1004,7 +1004,7 @@ function listenForNewPosts(endpoint, logger, callback) {
 
 /**
  * This function creates a change stream listener on posts
- * @param {String} endpoint
+ * @param {String}endpoint
  * @param {Object} logger
  * @param {Function || Array} callback
  * @returns {Promise}
