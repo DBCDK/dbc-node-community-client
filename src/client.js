@@ -3,7 +3,7 @@
 const request = require('request');
 const uuid = require('node-uuid');
 const http = require('http');
-const url = require('url');
+const url_parser = require('url').parse;
 const forever = require('async/forever');
 
 /**
@@ -16,7 +16,7 @@ const forever = require('async/forever');
  */
 function changeStreamListener(endpoint, model, callback, logger) {
   return new Promise((resolve) => {
-    const opts = url.parse(`${endpoint}api/${model}/change-stream?_format=event-stream`);
+    const opts = url_parser(`${endpoint}api/${model}/change-stream?_format=event-stream`);
     opts.agent = new http.Agent({keepAlive: true});
 
     const eventRegex = /^event: ([a-zA-Z]+)/;
@@ -1034,6 +1034,7 @@ module.exports = function CommunityClient(logger, config = null) {
   return {
     listenForNewQuarantines: listenForNewQuarantines.bind(null, config.endpoint, logger),
     listenForNewPosts: listenForNewPosts.bind(null, config.endpoint, logger),
+    listenForNewComments: listenForNewComments.bind(null, config.endpoint, logger),
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
     checkIfDisplayNameIsTaken: checkIfDisplayNameIsTaken.bind(null, config.endpoint),
     checkIfProfileIsQuarantined: checkIfProfileIsQuarantined.bind(null, config.endpoint),
