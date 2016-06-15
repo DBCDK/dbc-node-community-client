@@ -15,14 +15,20 @@ const forever = require('async/forever');
  * @returns {Promise}
  */
 function changeStreamListener(endpoint, model, callback, logger) {
+  // Return a promise so the serviceprovider is happy
   return new Promise((resolve) => {
+    // Parse out the url for the change stream and add a keep-alive agent to it.
     const opts = url_parser(`${endpoint}api/${model}/change-stream?_format=event-stream`);
     opts.agent = new http.Agent({keepAlive: true});
 
+    // This regex helps us get the name of the event, and stores it in currentEvent.
     const eventRegex = /^event: ([a-zA-Z]+)/;
     let currentEvent = 'someunidentifiedevent: ';
+
+    // We want to ensure the promise is only resolved once, despite the retry logic, to avoid error...
     let resolved = false;
 
+    // The callback can be a function, or an array of functions, therefore we have some logic to handle both situations as a single function.
     let cb = callback;
     if (Array.isArray(callback)) {
       cb = (err, res) => {
@@ -30,11 +36,45 @@ function changeStreamListener(endpoint, model, callback, logger) {
       };
     }
 
+    // We use backoff to ensure we don't block the event loop.
+    let timeout = 0; // start at 0, as we don't want a timeout on the first (re)connect.
+    const timeoutIncrement = 100; // increment the timeout by 100 ms per failure.
+    const maxTimeout = 60000; // We want a max of one minute.
+
+    // The magic starts here, this is an async loop which runs forever, to ensure whenever we loose a connection, it is reestablished automatically.
     forever(retry => {
+      // We construct a handler for both end and error
+      const retryHandler = (err) => {
+        if (err) {
+          // An error occurred, so we log it.
+          logger.error(`got error from ${model} change stream, retrying`, err);
+        }
+        else {
+          // The stream end regularly (The unfortunate nature of long polling), so we log it.
+          logger.info(`${model} stream ended, retrying`);
+        }
+
+        // Retry with backoff.
+        setTimeout(() => {
+          if (timeout < maxTimeout) { // We want a max of one minute.
+            timeout += timeoutIncrement;
+          }
+          retry();
+        }, timeout);
+      };
+
+      // we now insert the url with the keepAlive on, and make a get request.
       http.get(opts, response => {
+        // Whenever we get some data, we want to start parsing it.
         response.on('data', d => {
+          // we got data, so reset the timeout
+          timeout = 0;
+
+          // d is a buffer, so we convert it to a string.
           const dataString = d.toString();
 
+          // The ACK signal of the stream is :ok
+          // This tells us the listener has begun
           if (dataString.indexOf(':ok') === 0) {
             if (!resolved) {
               resolved = true;
@@ -43,28 +83,28 @@ function changeStreamListener(endpoint, model, callback, logger) {
 
             logger.info(`Started listening to ${model}`);
           }
+          // Whenever a change occurs, we first get an event, we use this to help us parse the change.
           else if (dataString.indexOf('event: ') === 0) {
             currentEvent = `${eventRegex.exec(dataString)[1]}: `;
           }
+          // After we got the event, we want to respond to it
+          // We do this by calling our callback(s) with a parsed version of the event.
           else if (dataString.indexOf(currentEvent) === 0) {
             const jsonData = JSON.parse(dataString.substring(currentEvent.length));
             cb(null, jsonData);
           }
+          // If the above scenarios can't parse the data, something unexpected has happened.
           else {
             cb('something weird happened');
           }
         });
 
-        response.on('error', error => {
-          logger.error(`got error from ${model} change stream, retrying`, error);
-          retry();
-        });
-
-        response.on('end', () => {
-          logger.info(`${model} stream ended, retrying`);
-          retry();
-        });
-      });
+        // If the connection is inactive, the connection is dropped, so we want to restart it
+        // Whenever an error occurs, we want to log the error, and retry the stream.
+        // This is where we get stuff like ECONNREFUSED ie. if the service is redeploying.
+        response.on('end', retryHandler);
+        response.on('error', retryHandler);
+      }).on('error', retryHandler);
     });
   });
 }
