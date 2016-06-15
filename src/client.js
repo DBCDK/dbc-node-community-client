@@ -61,7 +61,7 @@ function changeStreamListener(endpoint, model, callback, logger) {
           }
           retry();
         }, timeout);
-      }
+      };
 
       // we now insert the url with the keepAlive on, and make a get request.
       http.get(opts, response => {
