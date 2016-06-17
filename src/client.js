@@ -747,7 +747,8 @@ function likePost(endpoint, params) {
     const url = endpoint + 'api/Posts/' + postId + '/likes?access_token=' + accessToken;
     const likePostBody = {
       value,
-      profileId
+      profileId,
+      likeid: postId
     };
 
     const requestParams = {
