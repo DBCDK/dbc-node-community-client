@@ -1077,6 +1077,12 @@ function listenForNewComments(endpoint, logger, callback) {
   return changeStreamListener(endpoint, 'Comments', callback, logger);
 }
 
+function groupSuggest(endpoint, logger, params) {
+  return promiseRequest('get', {
+    url: `${endpoint}api/Groups/suggest?q=${encodeURIComponent(params.q)}`
+  });
+}
+
 /**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
@@ -1136,6 +1142,7 @@ module.exports = function CommunityClient(logger, config = null) {
     getReviews: getReviews.bind(null, config.endpoint),
     checkForMemberInGroup: checkForMemberInGroup.bind(null, config.endpoint),
     getUserQuarantines: getUserQuarantines.bind(null, config.endpoint),
-    createReview: createReview.bind(null, config.endpoint)
+    createReview: createReview.bind(null, config.endpoint),
+    groupSuggest: groupSuggest.bind(null, config.endpoint, logger)
   };
 };
