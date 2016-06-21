@@ -501,7 +501,6 @@ function queryGroups(endpoint, params) {
  * Searches through Groups in Loopback (via a elasticsearch mixin)
  */
 function searchGroups(endpoint, params) {
-    console.log("searchGroups:", params);
   return new Promise((resolve, reject) => {
     const accessToken = params.accessToken;
     const fields = JSON.stringify(params.fields);
