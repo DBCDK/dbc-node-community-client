@@ -253,6 +253,7 @@ function joinGroup(endpoint, {uid, groupId, accessToken}) {
     url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
     json: true
   });
+
 }
 
 /**
@@ -479,7 +480,7 @@ function getAllComments(endpoint, params) {
 }
 
 /**
- * Searches through Groups in Loopback
+ * Queriess through Groups in Loopback
  */
 function queryGroups(endpoint, params) {
   return new Promise((resolve, reject) => {
@@ -495,6 +496,24 @@ function queryGroups(endpoint, params) {
     });
   });
 }
+
+/**
+ * Searches through Groups in Loopback (via a elasticsearch mixin)
+ */
+function searchGroups(endpoint, params) {
+  return new Promise((resolve, reject) => {
+    const accessToken = params.accessToken;
+    const fields = JSON.stringify(params.fields);
+    const url = endpoint + 'api/Groups/search?access_token=' + accessToken + '&q=' + params.q + '&fields=' + fields + '&limit=' + params.limit + '&from=' + params.from;
+    request.get({url}, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+}
+
 
 /**
  * Create a Post on a Group
@@ -1095,6 +1114,7 @@ module.exports = function CommunityClient(logger, config = null) {
     getComments: getComments.bind(null, config.endpoint),
     getAllComments: getAllComments.bind(null, config.endpoint),
     queryGroups: queryGroups.bind(null, config.endpoint),
+    searchGroups: searchGroups.bind(null, config.endpoint),
     flagPost: flagPost.bind(null, config.endpoint),
     flagComment: flagComment.bind(null, config.endpoint),
     flagGroup: flagGroup.bind(null, config.endpoint),
