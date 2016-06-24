@@ -504,7 +504,8 @@ function searchGroups(endpoint, params) {
   return new Promise((resolve, reject) => {
     const accessToken = params.accessToken;
     const fields = JSON.stringify(params.fields);
-    const url = endpoint + 'api/Groups/search?access_token=' + accessToken + '&q=' + params.q + '&fields=' + fields + '&limit=' + params.limit + '&from=' + params.from;
+    const q = encodeURIComponent(params.q);
+    const url = endpoint + 'api/Groups/search?access_token=' + accessToken + '&q=' + q + '&fields=' + fields + '&limit=' + params.limit + '&from=' + params.from;
     request.get({url}, (err, res) => {
       if (err) {
         reject(err);
