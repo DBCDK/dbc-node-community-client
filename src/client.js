@@ -1097,28 +1097,26 @@ function topWorksFromReviews(endpoint, params) {
   const ratingParameter = params.ratingParameter || 1;
   const countsParameter = params.countsParameter || 1;
 
-  const query = JSON.stringify(
-    {
-      size,
-      aggs: {
-        range: {
-          date_range: {
-            field: 'created',
-            format: 'MM-yyy',
-            ranges: [
-              {from: `now-${age}d`}
-            ]
-          },
-          aggs: {
-            pids: {
-              terms: {field: 'pid.raw', size: size * 2}, // The works are sorted manually, so we need at least twice as many to provide a decent image.
-              aggs: {
-                avg_rate: {avg: {field: 'rating'}},
-                pid_score: {
-                  bucket_script: {
-                    buckets_path: {avg_rate: 'avg_rate', pids: '_count'},
-                    script: `(log(pids) * ${countsParameter}) * (avg_rate * ${ratingParameter})`
-                  }
+  const query = JSON.stringify({
+    size,
+    aggs: {
+      range: {
+        date_range: {
+          field: 'created',
+          format: 'MM-yyy',
+          ranges: [
+            {from: `now-${age}d`}
+          ]
+        },
+        aggs: {
+          pids: {
+            terms: {field: 'pid.raw', size: size * 2}, // The works are sorted manually, so we need at least twice as many to provide a decent image.
+            aggs: {
+              avg_rate: {avg: {field: 'rating'}},
+              pid_score: {
+                bucket_script: {
+                  buckets_path: {avg_rate: 'avg_rate', pids: '_count'},
+                  script: `(log(pids) * ${countsParameter}) * (avg_rate * ${ratingParameter})`
                 }
               }
             }
@@ -1126,7 +1124,7 @@ function topWorksFromReviews(endpoint, params) {
         }
       }
     }
-  );
+  });
 
   return promiseRequest('get', {
     url: `${endpoint}/api/Reviews/search?limit=1&q=${query}`
