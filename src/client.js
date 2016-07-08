@@ -1137,7 +1137,11 @@ function topWorksFromReviews(endpoint, params) {
     aggs: shouldFilter ? {
       worktypes: {
         filters: {
-          filters: worktypes.map(wType => {term: {worktype: wType}})
+          filters: worktypes.map(wType => ({
+            term: { //
+              worktype: wType
+            }
+          }))
         },
         aggs: popAggregation
       }
