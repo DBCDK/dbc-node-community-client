@@ -1092,34 +1092,35 @@ function groupSuggest(endpoint, logger, params) {
  * @returns {Promise}
  */
 function topWorksFromReviews(endpoint, params) {
+  // First we extract our arguments from params.
   const size = params.size || 50;
   const age = params.age || 365;
   const ratingParameter = params.ratingParameter || 1;
   const countsParameter = params.countsParameter || 1;
+  const worktypes = params.worktypes || [];
+  const shouldFilter = !!worktypes.length;
 
-  const query = JSON.stringify({
-    size,
-    aggs: {
-      range: {
-        date_range: {
-          field: 'created',
-          format: 'MM-yyy',
-          ranges: [
-            {from: `now-${age}d`}
-          ]
-        },
-        aggs: {
-          pids: {
-            terms: {field: 'pid.raw', size: size * 2}, // The works are sorted manually, so we need at least twice as many to provide a decent image.
-            aggs: {
-              avg_rate: {avg: {field: 'rating'}},
-              pid_score: {
-                bucket_script: {
-                  buckets_path: {avg_rate: 'avg_rate', pids: '_count'},
-                  script: {
-                    inline: `(log10(pids) * ${countsParameter}) * (avg_rate * ${ratingParameter})`,
-                    lang: 'expression'
-                  }
+  // Now we construct an aggregation that assigns a score to works based on reviews.
+  const popAggregation = {
+    range: {
+      date_range: {
+        field: 'created',
+        format: 'MM-yyy',
+        ranges: [
+          {from: `now-${age}d`}
+        ]
+      },
+      aggs: {
+        pids: {
+          terms: {field: 'pid.raw', size: size * 2}, // The works are sorted manually, so we need at least twice as many to provide a decent image.
+          aggs: {
+            avg_rate: {avg: {field: 'rating'}},
+            pid_score: {
+              bucket_script: {
+                buckets_path: {avg_rate: 'avg_rate', pids: '_count'},
+                script: {
+                  inline: `(log10(pids + 1) * ${countsParameter}) * (avg_rate * ${ratingParameter})`,
+                  lang: 'expression'
                 }
               }
             }
@@ -1127,6 +1128,20 @@ function topWorksFromReviews(endpoint, params) {
         }
       }
     }
+  };
+
+  // And we construct a query to send to the community service.
+  const query = JSON.stringify({
+    size,
+    // If we want to filter based on worktypes, we need a different query.
+    aggs: shouldFilter ? {
+      worktypes: {
+        filters: {
+          filters: worktypes.map(wType => {term: {worktype: wType}})
+        },
+        aggs: popAggregation
+      }
+    } : popAggregation
   });
 
   return promiseRequest('get', {
