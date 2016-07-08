@@ -1127,7 +1127,7 @@ function topWorksFromReviews(endpoint, params) {
   });
 
   return promiseRequest('get', {
-    url: `${endpoint}/api/Reviews/search?limit=1&q=${query}`
+    url: `${endpoint}api/Reviews/search?limit=1&q=${query}`
   });
 }
 
