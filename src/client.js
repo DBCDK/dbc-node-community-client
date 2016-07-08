@@ -1119,7 +1119,7 @@ function topWorksFromReviews(endpoint, params) {
               bucket_script: {
                 buckets_path: {avg_rate: 'avg_rate', pids: '_count'},
                 script: {
-                  inline: `(log10(pids + 1) * ${countsParameter}) * (avg_rate * ${ratingParameter})`,
+                  inline: `(log10(pids) * ${countsParameter}) * (avg_rate * ${ratingParameter})`,
                   lang: 'expression'
                 }
               }
