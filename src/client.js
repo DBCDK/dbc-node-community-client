@@ -178,6 +178,34 @@ function removeImage(endpoint, {imageId, accessToken}) {
   });
 }
 
+/**
+ * Uploads an image to s3 and creates all necessary relations to return an imageCollection object.
+ * @param {String} endpoint
+ * @param {File} image
+ * @param {String} accessToken
+ * @param {String} container
+ * @returns {Promise}
+ */
+function uploadImage(endpoint, {image, accessToken, container = 'uxdev-biblo-imagebucket'}) {
+  let fileExtension = image.originalname.split('.');
+  fileExtension = fileExtension[fileExtension.length - 1];
+  const fileName = uuid.v4().replace('-', '') + '.' + fileExtension;
+
+  return promiseRequest('post', {
+    url: `${endpoint}api/ImageCollections/upload?access_token=${accessToken}&container=${container}`,
+    json: true,
+    formData: {
+      file: {
+        value: image.buffer,
+        options: {
+          contentType: image.mimetype,
+          filename: fileName
+        }
+      }
+    }
+  });
+}
+
 function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
   let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
@@ -1179,6 +1207,7 @@ module.exports = function CommunityClient(logger, config = null) {
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
     updateImage: updateImage.bind(null, config.endpoint),
+    uploadImage: uploadImage.bind(null, config.endpoint),
     removeImage: removeImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
     getImage: getImage.bind(null, config.endpoint),
