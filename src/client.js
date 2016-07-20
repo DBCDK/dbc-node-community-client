@@ -206,6 +206,29 @@ function uploadImage(endpoint, {image, accessToken, container = 'uxdev-biblo-ima
   });
 }
 
+/**
+ * This function updates an image collection, it only allows valid fields to be sent.
+ * @param {String} endpoint
+ * @param {PlainObject} query
+ * @returns {Promise}
+ */
+function updateImageCollection(endpoint, query) {
+  const {id} = query;
+  const form = {};
+  ['profileImageCollection', 'groupCoverImageCollectionId', 'postImageCollection', 'commentImageCollection', 'reviewImageCollection']
+    .forEach(f => {
+      if (query[f]) {
+        form[f] = query[f];
+      }
+    });
+
+  return promiseRequest('put', {
+    url: `${endpoint}api/ImageCollections/${id}`,
+    json: true,
+    form
+  });
+}
+
 function updateImage(endpoint, {image, relationId, relationType, accessToken}) {
   let fileExtension = image.originalname.split('.');
   fileExtension = fileExtension[fileExtension.length - 1];
@@ -1207,6 +1230,7 @@ module.exports = function CommunityClient(logger, config = null) {
     createProfile: createProfile.bind(null, config.endpoint),
     updateProfile: updateProfile.bind(null, config.endpoint),
     updateImage: updateImage.bind(null, config.endpoint),
+    updateImageCollection: updateImageCollection.bind(null, config.endpoint),
     uploadImage: uploadImage.bind(null, config.endpoint),
     removeImage: removeImage.bind(null, config.endpoint),
     getFullProfile: getFullProfile.bind(null, config.endpoint),
