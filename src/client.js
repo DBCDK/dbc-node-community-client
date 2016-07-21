@@ -1205,6 +1205,26 @@ function topWorksFromReviews(endpoint, params) {
 }
 
 /**
+ * Generic get campaign
+ * @param {String} endpoint
+ * @param {String} type
+ * @returns {Promise}
+ */
+function getCampaigns(endpoint, type) {
+  const filter = {
+    where: {
+      type
+    }
+  };
+
+  const filterString = encodeURIComponent(JSON.stringify(filter));
+  return promiseRequest('get', {
+    url: `${endpoint}api/Campaigns?filter=${filterString}`,
+    json: true
+  });
+}
+
+/**
  * Gets review campaigns
  * @param {String} endpoint
  * @returns {Promise}
@@ -1227,26 +1247,6 @@ function getReviewCampaigns(endpoint) {
  */
 function getGroupCampaigns(endpoint) {
   return getCampaigns(endpoint, 'group');
-}
-
-/**
- * Generic get campaign
- * @param {String} endpoint
- * @param {String} type
- * @returns {Promise}
- */
-function getCampaigns(endpoint, type) {
-  const filter = {
-    where: {
-      type
-    }
-  }
-
-  const filterString = encodeURIComponent(JSON.stringify(filter));
-  return promiseRequest('get', {
-    url: `${endpoint}api/Campaigns?filter=${filterString}`,
-    json: true
-  });
 }
 
 /**
