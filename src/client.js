@@ -1205,6 +1205,51 @@ function topWorksFromReviews(endpoint, params) {
 }
 
 /**
+ * Generic get campaign
+ * @param {String} endpoint
+ * @param {String} type
+ * @returns {Promise}
+ */
+function getCampaigns(endpoint, type) {
+  const filter = {
+    where: {
+      type
+    }
+  };
+
+  const filterString = encodeURIComponent(JSON.stringify(filter));
+  return promiseRequest('get', {
+    url: `${endpoint}api/Campaigns?filter=${filterString}`,
+    json: true
+  });
+}
+
+/**
+ * Gets review campaigns
+ * @param {String} endpoint
+ * @returns {Promise}
+ */
+function getReviewCampaigns(endpoint) {
+  return getCampaigns(endpoint, 'review').then(campaignsResponse => {
+    const campaigns = campaignsResponse.body.map(campaign => {
+      campaign.workTypes = campaign.workTypes.map(type => type.worktype);
+      return campaign;
+    });
+
+    return campaigns;
+  });
+}
+
+/**
+ * Gets group campaigns
+ * @param {String} endpoint
+ * @returns {Promise}
+ */
+function getGroupCampaigns(endpoint) {
+  return getCampaigns(endpoint, 'group');
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -1267,6 +1312,8 @@ module.exports = function CommunityClient(logger, config = null) {
     checkForMemberInGroup: checkForMemberInGroup.bind(null, config.endpoint),
     getUserQuarantines: getUserQuarantines.bind(null, config.endpoint),
     createReview: createReview.bind(null, config.endpoint),
-    groupSuggest: groupSuggest.bind(null, config.endpoint, logger)
+    groupSuggest: groupSuggest.bind(null, config.endpoint, logger),
+    getReviewCampaigns: getReviewCampaigns.bind(null, config.endpoint),
+    getGroupCampaigns: getGroupCampaigns.bind(null, config.endpoint)
   };
 };
