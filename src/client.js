@@ -1205,6 +1205,19 @@ function topWorksFromReviews(endpoint, params) {
 }
 
 /**
+ * Get campaign by id.
+ * @param {String} endpoint
+ * @param {number} id
+ * @returns {Promise}
+ */
+function getCampaign(endpoint, {id}) {
+  return promiseRequest('get', {
+    url: `${endpoint}api/Campaigns/${id}`,
+    json: true
+  });
+}
+
+/**
  * Generic get campaign
  * @param {String} endpoint
  * @param {String} type
@@ -1314,6 +1327,7 @@ module.exports = function CommunityClient(logger, config = null) {
     createReview: createReview.bind(null, config.endpoint),
     groupSuggest: groupSuggest.bind(null, config.endpoint, logger),
     getReviewCampaigns: getReviewCampaigns.bind(null, config.endpoint),
-    getGroupCampaigns: getGroupCampaigns.bind(null, config.endpoint)
+    getGroupCampaigns: getGroupCampaigns.bind(null, config.endpoint),
+    getCampaign: getCampaign.bind(null, config.endpoint)
   };
 };
