@@ -1221,13 +1221,15 @@ function getCampaign(endpoint, {id}) {
  * Generic get campaign
  * @param {String} endpoint
  * @param {String} type
+ * @param {mixed} include
  * @returns {Promise}
  */
-function getCampaigns(endpoint, type) {
+function getCampaigns(endpoint, type, include = []) {
   const filter = {
     where: {
       type
-    }
+    },
+    include
   };
 
   const filterString = encodeURIComponent(JSON.stringify(filter));
@@ -1259,7 +1261,7 @@ function getReviewCampaigns(endpoint) {
  * @returns {Promise}
  */
 function getGroupCampaigns(endpoint) {
-  return getCampaigns(endpoint, 'group');
+  return getCampaigns(endpoint, 'group', 'group');
 }
 
 /**
