@@ -299,12 +299,35 @@ function getResizedImage(endpoint, {id, size}) {
   });
 }
 
+/**
+ * Lets a user join a group, also used to update when a user last visited a group.
+ * @param endpoint
+ * @param uid
+ * @param groupId
+ * @param accessToken
+ * @returns {Promise.<TResult>}
+ */
 function joinGroup(endpoint, {uid, groupId, accessToken}) {
-  return promiseRequest('put', {
-    url: endpoint + 'api/Profiles/' + uid + '/groups/rel/' + groupId + '?access_token=' + accessToken,
+  return promiseRequest('get', {
+    url: `${endpoint}api/GroupProfiles?filter=%7B%22where%22%3A%20%7B%22profileid%22%3A${uid}%2C%20%22groupid%22%3A%20${groupId}%7D%7D`,
     json: true
-  });
+  }).then(following => {
+    const putBody = {
+      profileid: uid,
+      groupid: groupId,
+      visited: Date.now()
+    };
 
+    if (following.length > 0) {
+      putBody.id = following[0].id;
+    }
+
+    return promiseRequest('put', {
+      url: `${endpoint}api/GroupProfiles?access_token=${accessToken}`,
+      body: putBody,
+      json: true
+    });
+  });
 }
 
 /**
@@ -1265,6 +1288,41 @@ function getGroupCampaigns(endpoint) {
 }
 
 /**
+ * Gets the members of a group
+ * @param {String} endpoint
+ * @param {number} id
+ * @returns {Promise}
+ */
+function getGroupMembers(endpoint, {id, filter = {}}) {
+  filter = encodeURIComponent(JSON.stringify(filter));
+  return promiseRequest('get', {
+    url: `${endpoint}api/Groups/${id}/members?filter=${filter}`,
+    json: true
+  }).then(res => res.body);
+}
+
+/**
+ * Gets a users groups.
+ * @param {string} endpoint
+ * @param {number}uid
+ * @param {mixed} include
+ * @returns {Promise}
+ */
+function getMyGroups(endpoint, {uid, include = 'group'}) {
+  const filter = encodeURIComponent(JSON.stringify({
+    where: {
+      profileid: uid
+    },
+    include
+  }));
+
+  return promiseRequest('get', {
+    url: `${endpoint}api/GroupProfiles?filter=${filter}`,
+    json: true
+  }).then(res => res.body);
+}
+
+/**
  * Setting the necessary paramerters for the client to be usable.
  * The endpoint is only set if endpoint is null to allow setting it through
  * environment variables.
@@ -1330,6 +1388,8 @@ module.exports = function CommunityClient(logger, config = null) {
     groupSuggest: groupSuggest.bind(null, config.endpoint, logger),
     getReviewCampaigns: getReviewCampaigns.bind(null, config.endpoint),
     getGroupCampaigns: getGroupCampaigns.bind(null, config.endpoint),
-    getCampaign: getCampaign.bind(null, config.endpoint)
+    getCampaign: getCampaign.bind(null, config.endpoint),
+    getGroupMembers: getGroupMembers.bind(null, config.endpoint),
+    getMyGroups: getMyGroups.bind(null, config.endpoint)
   };
 };
