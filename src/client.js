@@ -1304,7 +1304,7 @@ function getGroupMembers(endpoint, {id, filter = {}}) {
 /**
  * Gets a users groups.
  * @param {string} endpoint
- * @param {number} uid
+ * @param {number}uid
  * @param {mixed} include
  * @returns {Promise}
  */
