@@ -318,8 +318,8 @@ function joinGroup(endpoint, {uid, groupId, accessToken}) {
       visited: Date.now()
     };
 
-    if (following.length > 0) {
-      putBody.id = following[0].id;
+    if (following.body.length > 0) {
+      putBody.id = following.body[0].id;
     }
 
     return promiseRequest('put', {
