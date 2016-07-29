@@ -1233,9 +1233,17 @@ function topWorksFromReviews(endpoint, params) {
  * @param {number} id
  * @returns {Promise}
  */
-function getCampaign(endpoint, {id}) {
+function getCampaign(endpoint, {id, filter}) {
+  filter = encodeURIComponent(
+    JSON.stringify(
+      Object.assign({
+        include: {group: 'coverImage'}
+      }, filter)
+    )
+  );
+
   return promiseRequest('get', {
-    url: `${endpoint}api/Campaigns/${id}`,
+    url: `${endpoint}api/Campaigns/${id}?filter=${filter}`,
     json: true
   });
 }
