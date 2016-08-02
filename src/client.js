@@ -1030,17 +1030,9 @@ function markReviewAsDeleted(endpoint, params) {
 
 
 function getReviews(endpoint, params) {
-  return new Promise((resolve) => {
-    const filter_str = JSON.stringify(params.filter || []);
-    const url = endpoint + 'api/reviews/?filter=' + filter_str;
-    request.get(
-      {
-        url: url
-      },
-      (err, httpResponse) => {
-        resolve(httpResponse);
-      }
-    );
+  return promiseRequest('get', {
+    url: `${endpoint}api/reviews/?filter=${JSON.stringify(params.filter || [])}`,
+    json: true
   });
 }
 
