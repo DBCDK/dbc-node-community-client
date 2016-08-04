@@ -1169,7 +1169,7 @@ function checkIfGroupNameExists(endpoint, params) {
 
   return promiseRequest('get', {
     url: `${endpoint}api/Groups/count?${queryString}`
-  })
+  });
 }
 
 /**
