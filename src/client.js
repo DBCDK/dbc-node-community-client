@@ -1144,10 +1144,32 @@ function listenForNewComments(endpoint, logger, callback) {
   return changeStreamListener(endpoint, 'Comments', callback, logger);
 }
 
+/**
+ * This method calls the community service suggester on groups.
+ * @param {String}endpoint
+ * @param {Object}logger
+ * @param {Object}params
+ * @returns {Promise}
+ */
 function groupSuggest(endpoint, logger, params) {
   return promiseRequest('get', {
     url: `${endpoint}api/Groups/suggest?q=${encodeURIComponent(params.q)}`
   });
+}
+
+/**
+ * Checks if a group name is taken.
+ * @param {URL}endpoint
+ * @param {Object}params
+ * @returns {Promise}
+ */
+function checkIfGroupNameExists(endpoint, params) {
+  // where[name][regexp]=/^${params.groupName}$/i
+  const queryString = `where%5Bname%5D%5Bregexp%5D=%2F%5E${encodeURIComponent(params.groupName)}%24%2Fi`;
+
+  return promiseRequest('get', {
+    url: `${endpoint}api/Groups/count?${queryString}`
+  })
 }
 
 /**
@@ -1343,6 +1365,7 @@ module.exports = function CommunityClient(logger, config = null) {
     topWorksFromReviews: topWorksFromReviews.bind(null, config.endpoint),
     checkIfUserProfileExists: checkIfUserProfileExists.bind(null, config.endpoint),
     checkIfDisplayNameIsTaken: checkIfDisplayNameIsTaken.bind(null, config.endpoint),
+    checkIfGroupNameExists: checkIfGroupNameExists.bind(null, config.endpoint),
     checkIfProfileIsQuarantined: checkIfProfileIsQuarantined.bind(null, config.endpoint),
     loginAndGetProfile: loginAndGetProfile.bind(null, config.endpoint),
     createProfile: createProfile.bind(null, config.endpoint),
