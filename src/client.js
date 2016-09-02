@@ -967,6 +967,17 @@ function checkIfProfileIsQuarantined(endpoint, id) {
 }
 
 /**
+ * Delete Group
+ *
+ * @param endpoint
+ * @param params
+ * @returns {Promise}
+ */
+function deleteGroup(endpoint, {id, accessToken}) {
+  return promiseRequest('delete', {url: `${endpoint}api/Groups/${id}?access_token=${accessToken}`});
+}
+
+/**
  * Mark a post as deleted
  */
 function markPostAsDeleted(endpoint, params) {
@@ -1380,6 +1391,7 @@ module.exports = function CommunityClient(logger, config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    deleteGroup: deleteGroup.bind(null, config.endpoint),
     listGroups: listGroups.bind(null, config.endpoint),
     getPosts: getPosts.bind(null, config.endpoint),
     getComments: getComments.bind(null, config.endpoint),
