@@ -973,7 +973,7 @@ function checkIfProfileIsQuarantined(endpoint, id) {
  * @param params
  * @returns {Promise}
  */
-function deleteGroup(endpoint, {id, accessToken}){
+function deleteGroup(endpoint, {id, accessToken}) {
   return promiseRequest('delete', {url: `${endpoint}api/Groups/${id}?access_token=${accessToken}`});
 }
 
