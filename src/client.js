@@ -978,6 +978,21 @@ function deleteGroup(endpoint, {id, accessToken}) {
 }
 
 /**
+ * Close Group
+ *
+ * @param endpoint
+ * @param params
+ * @returns {Promise}
+ */
+function closeGroup(endpoint, {id, timeClosed, accessToken}) {
+  return promiseRequest('put', {
+    url: `${endpoint}api/Groups/${id}?access_token=${accessToken}`,
+    body: {timeClosed},
+    json: true
+  });
+}
+
+/**
  * Mark a post as deleted
  */
 function markPostAsDeleted(endpoint, params) {
@@ -1391,6 +1406,7 @@ module.exports = function CommunityClient(logger, config = null) {
     joinGroup: joinGroup.bind(null, config.endpoint),
     leaveGroup: leaveGroup.bind(null, config.endpoint),
     getGroup: getGroup.bind(null, config.endpoint),
+    closeGroup: closeGroup.bind(null, config.endpoint),
     deleteGroup: deleteGroup.bind(null, config.endpoint),
     listGroups: listGroups.bind(null, config.endpoint),
     getPosts: getPosts.bind(null, config.endpoint),
