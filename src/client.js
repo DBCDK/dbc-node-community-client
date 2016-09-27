@@ -525,6 +525,7 @@ function getPosts(endpoint, params) {
     );
   });
 }
+
 /**
  * Fetches a comments for a post in Loopback
  */
