@@ -1,6 +1,6 @@
 {
   "name": "dbc-node-community-client",
-  "version": "5.0.5",
+  "version": "5.1.0",
   "description": "Client for the DBC community service",
   "main": "src/client.js",
   "scripts": {

@@ -1208,6 +1208,7 @@ function checkIfGroupNameExists(endpoint, params) {
  */
 function topWorksFromReviews(endpoint, params) {
   // First we extract our arguments from params.
+  const offset = params.offset || 0;
   const size = params.size || 50;
   const age = params.age || 365;
   const ratingParameter = params.ratingParameter || 1;
@@ -1247,6 +1248,7 @@ function topWorksFromReviews(endpoint, params) {
 
   // And we construct a query to send to the community service.
   const query = JSON.stringify({
+    from: offset,
     size,
     // If we want to filter based on worktypes, we need a different query.
     aggs: shouldFilter ? {
