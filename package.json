@@ -21,8 +21,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "async": "^2.0.0-rc.6",
-    "node-uuid": "^1.4.7",
-    "request": "^2.60.0"
+    "request": "^2.60.0",
+    "uuid": "^3.0.0"
   },
   "devDependencies": {
     "chai": "^3.2.0",
