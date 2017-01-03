@@ -672,6 +672,22 @@ function createComment(endpoint, params) {
   });
 }
 
+/**
+ * Marks a comment as deleted in the CS.
+ * @param endpoint
+ * @param id
+ */
+function deleteComment(endpoint, {id}) {
+  request.put({
+    url: `${endpoint}api/Comments`,
+    json: true,
+    body: {
+      id: id,
+      timeDeleted: Date.now()
+    }
+  });
+}
+
 function countComments(endpoint, {accessToken, where}) {
   return promiseRequest('get', `${endpoint}api/Comments/count?access_token=${accessToken}${where ? `&where=${JSON.stringify(where)}` : ''}`);
 }
@@ -1423,6 +1439,7 @@ module.exports = function CommunityClient(logger, config = null) {
     flagReview: flagReview.bind(null, config.endpoint),
     createPost: createPost.bind(null, config.endpoint),
     createComment: createComment.bind(null, config.endpoint),
+    deleteComment: deleteComment.bind(null, config.endpoint),
     createGroup: createGroup.bind(null, config.endpoint),
     updateGroup: updateGroup.bind(null, config.endpoint),
     countComments: countComments.bind(null, config.endpoint),
