@@ -1,7 +1,7 @@
 'use strict';
 
 const request = require('request');
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 const http = require('http');
 const url_parser = require('url').parse;
 const forever = require('async/forever');
